@@ -133,11 +133,7 @@ body{background:#0a0a0a;color:#e5e5e5;font-family:'DM Sans',-apple-system,system
 .qr-box{text-align:center;padding:12px 0}
 .qr-label{font-size:11px;color:#525252;margin-top:6px}
 
-/* Uber */
-.uber-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:#000;border:1px solid #262626;border-radius:12px;color:#fff;font-size:13px;font-weight:600;text-decoration:none;margin:6px 0}
 
-/* Spotify */
-.spotify-embed{border-radius:12px;overflow:hidden;margin:8px 0}
 
 /* Map */
 .map-embed{border-radius:12px;overflow:hidden;margin:8px 0;border:1px solid #1f1f1f}
@@ -220,12 +216,9 @@ const L={
   stayLeft:isEn?"days left":"días restantes",
   lastDay:isEn?"Last day! Check-out today":"¡Último día! Check-out hoy",
   scanWifi:isEn?"Scan to connect":"Escanea para conectar",
-  uberTo:isEn?"🚗 Get an Uber here":"🚗 Pedir Uber aquí",
   howToGet:isEn?"How to get here":"Cómo llegar",
   howToGetD:isEn?"From Metro Etiopía (5 min walk): Exit the station, walk south on Av. Cuauhtémoc, turn right on Xochicalco. Building on the left, Torre B.":"Desde Metro Etiopía (5 min): Sal de la estación, camina al sur por Av. Cuauhtémoc, gira a la derecha en Xochicalco. Edificio a la izquierda, Torre B.",
   openMaps:isEn?"Open in Maps":"Abrir en Maps",
-  playlist:isEn?"Narvarte Vibes 🎵":"Narvarte Vibes 🎵",
-  playlistSub:isEn?"Curated playlist for your stay":"Playlist curada para tu estancia",
   nights:isEn?"Nights":"Noches",
   // Places
   vilsitoD:isEn?"By day a car repair shop, by night Narvarte's most legendary taco stand. Featured on Netflix's Taco Chronicles.":"De día es taller mecánico, de noche es la taquería más legendaria de la Narvarte. Apareció en Las Crónicas del Taco de Netflix.",
@@ -333,7 +326,6 @@ $("content").innerHTML=`
 <div class="guide">
 
   <!-- Uber -->
-  <a class="uber-btn" href="https://m.uber.com/ul/?action=setPickup&dropoff%5Bformatted_address%5D=Xochicalco%2026%2C%20Narvarte%20Poniente%2C%20Benito%20Ju%C3%A1rez%2C%2003020%20CDMX&dropoff%5Blatitude%5D=19.3915&dropoff%5Blongitude%5D=-99.1562" target="_blank">${L.uberTo}</a>
 
   <!-- How to get here -->
   <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🗺️</div><div class="card-t">${L.howToGet}</div></div><div class="chev">▼</div></div>
@@ -403,11 +395,7 @@ $("content").innerHTML=`
     <div class="place"><div class="place-name">${mlink("Manada","Manada bar Narvarte CDMX")}</div><div class="place-cat">${isEn?"Natural wines · Cocktails":"Vinos naturales · Coctelería"}</div><div class="place-desc">${L.manadaD}</div><div class="place-meta"><a href="${gm("Manada bar Narvarte CDMX")}" target="_blank">📍 Narvarte</a><span>💰 $$</span></div></div>
   </div></div>
 
-  <!-- Spotify -->
-  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🎵</div><div class="card-t">${L.playlist}</div></div><div class="chev">▼</div></div>
   <div class="card-b">
-    <div style="font-size:12px;color:#525252;margin-bottom:8px">${L.playlistSub}</div>
-    <div class="spotify-embed"><iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX5nwnRMcdReF?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe></div>
   </div></div>
 
   <div class="guide-divider"></div>
