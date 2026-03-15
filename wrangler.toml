@@ -5,3 +5,6 @@ compatibility_date = "2024-01-01"
 [vars]
 CHECKIN_HOUR = "15"
 CHECKOUT_HOUR = "11"
+SHELLY_DEVICE_ID = "a085e3c9b840"
+SHELLY_SERVER = "shelly-247-eu.shelly.cloud"
+ACCESS_KEY = "dh-narv-2026-secreto"
