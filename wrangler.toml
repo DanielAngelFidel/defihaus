@@ -1,0 +1,7 @@
+name = "puerta-narvarte"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+CHECKIN_HOUR = "15"
+CHECKOUT_HOUR = "11"
