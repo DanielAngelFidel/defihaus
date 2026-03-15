@@ -123,6 +123,40 @@ body{background:#0a0a0a;color:#e5e5e5;font-family:'DM Sans',-apple-system,system
 /* Checkin/out badge */
 .time-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:#141414;border:1px solid #1f1f1f;border-radius:8px;font-size:11px;color:#737373;margin:4px}
 
+/* Theme toggle */
+.theme-tog{position:fixed;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:#141414;border:1px solid #1f1f1f;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:50;font-size:14px}
+body.light{background:#f5f5f4;color:#1c1917}
+body.light .brand,body.light .sublabel,body.light .chev,body.light .place-meta,body.light .place-meta a,body.light .qr-label{color:#a8a29e}
+body.light .card,body.light .time-badge,body.light .countdown,body.light .pin-digit,body.light .theme-tog,body.light .map-embed{background:#fff;border-color:#e7e5e4}
+body.light .card-t,body.light .place-name,body.light .place-name a,body.light .label,body.light .pin-title,body.light .metro-station a,body.light .tip strong,body.light .emergency-info div:first-child,body.light .guide-hero h2{color:#1c1917}
+body.light .card-ico,body.light .wifi-val,body.light .wifi-pass,body.light .emergency,body.light .pin-icon{background:#f5f5f4}
+body.light .card-badge,body.light .pin-sub,body.light .wifi-name,body.light .emergency-info div:last-child{color:#78716c}
+body.light .place-desc,body.light .tip,body.light .rule span,body.light .metro-station{color:#57534e}
+body.light .wifi-pass-v{color:#059669}
+body.light .countdown strong{color:#d97706}
+body.light .guide-divider{background:linear-gradient(90deg,transparent,#d6d3d1,transparent)}
+body.light .pin-digit{color:#1c1917}
+body.light .toast{background:#059669}
+body.light .tip,body.light .wifi-item,body.light .place,body.light .metro-station{border-color:#e7e5e4}
+
+/* Countdown */
+.countdown{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#141414;border:1px solid #1f1f1f;border-radius:10px;margin-bottom:16px;font-size:12px;color:#a3a3a3}
+.countdown strong{color:#fbbf24;font-size:15px}
+
+/* QR */
+.qr-box{text-align:center;padding:12px 0}
+.qr-label{font-size:11px;color:#525252;margin-top:6px}
+
+/* Uber */
+.uber-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:#000;border:1px solid #262626;border-radius:12px;color:#fff;font-size:13px;font-weight:600;text-decoration:none;margin:6px 0}
+body.light .uber-btn{background:#1c1917}
+
+/* Spotify */
+.spotify-embed{border-radius:12px;overflow:hidden;margin:8px 0}
+
+/* Map */
+.map-embed{border-radius:12px;overflow:hidden;margin:8px 0;border:1px solid #1f1f1f}
+
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#34d399;color:#0a0a0a;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:100}
 .toast.show{opacity:1}
 </style>
@@ -136,6 +170,7 @@ body{background:#0a0a0a;color:#e5e5e5;font-family:'DM Sans',-apple-system,system
 </div>
 
 <div id="app">
+  <div class="theme-tog" id="themeTog" onclick="toggleTheme()">🌙</div>
   <div class="brand">Defihaus · Narvarte</div>
   <div id="content"></div>
 </div>
@@ -198,6 +233,15 @@ const L={
   bye:isEn?"We appreciate your respect and cooperation<br>Enjoy Narvarte!":"Agradecemos tu respeto y colaboración<br>¡Disfruta Narvarte!",
   copied:isEn?"Copied":"Copiado",
   walk:isEn?"walk":"caminando",
+  stayLeft:isEn?"days left":"días restantes",
+  lastDay:isEn?"Last day! Check-out today":"¡Último día! Check-out hoy",
+  scanWifi:isEn?"Scan to connect":"Escanea para conectar",
+  uberTo:isEn?"🚗 Get an Uber here":"🚗 Pedir Uber aquí",
+  howToGet:isEn?"How to get here":"Cómo llegar",
+  howToGetD:isEn?"From Metro Etiopía (5 min walk): Exit the station, walk south on Av. Cuauhtémoc, turn right on Xochicalco. Building on the left, Torre B.":"Desde Metro Etiopía (5 min): Sal de la estación, camina al sur por Av. Cuauhtémoc, gira a la derecha en Xochicalco. Edificio a la izquierda, Torre B.",
+  openMaps:isEn?"Open in Maps":"Abrir en Maps",
+  playlist:isEn?"Narvarte Vibes 🎵":"Narvarte Vibes 🎵",
+  playlistSub:isEn?"Curated playlist for your stay":"Playlist curada para tu estancia",
   nights:isEn?"Nights":"Noches",
   // Places
   vilsitoD:isEn?"By day a car repair shop, by night Narvarte's most legendary taco stand. Featured on Netflix's Taco Chronicles.":"De día es taller mecánico, de noche es la taquería más legendaria de la Narvarte. Apareció en Las Crónicas del Taco de Netflix.",
@@ -300,8 +344,21 @@ $("content").innerHTML=`
   <div class="circle idle" id="door" onclick="openDoor()"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#d4d4d4" stroke-width="1.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
   <div class="label" id="doorLabel" style="color:#e5e5e5">${L.tapOpen}</div>
   ${co?`<div class="sublabel">${L.accessUntil} ${co}</div>`:""}
+  ${data.checkOut?`<div class="countdown" id="countdown"></div>`:""}
 </div>
 <div class="guide">
+
+  <!-- Uber -->
+  <a class="uber-btn" href="https://m.uber.com/ul/?action=setPickup&dropoff[formatted_address]=Xochicalco+26,+Narvarte,+CDMX&dropoff[latitude]=19.3782&dropoff[longitude]=-99.1558" target="_blank">${L.uberTo}</a>
+
+  <!-- How to get here -->
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🗺️</div><div class="card-t">${L.howToGet}</div></div><div class="chev">▼</div></div>
+  <div class="card-b">
+    <div style="font-size:12px;color:#a3a3a3;line-height:1.6;margin-bottom:10px">${L.howToGetD}</div>
+    <a href="${gm("Xochicalco 26 Torre B Narvarte CDMX")}" target="_blank" style="display:block;padding:10px;background:#1a1a1a;border-radius:8px;text-decoration:none;color:#e5e5e5;font-size:12px;text-align:center">📍 Xochicalco 26, Torre B — ${L.openMaps}</a>
+    <div class="map-embed" style="margin-top:10px"><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d940.5!2d-99.1558!3d19.3782!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTnCsDIyJzQxLjUiTiA5OcKwMDknMjAuOSJX!5e0!3m2!1ses!2smx!4v1" width="100%" height="200" style="border:0" allowfullscreen loading="lazy"></iframe></div>
+  </div></div>
+
   <div class="guide-divider"></div>
 
   <!-- WiFi -->
@@ -311,6 +368,7 @@ $("content").innerHTML=`
     <div class="wifi-item"><span class="wifi-name">Recámara 1</span><span class="wifi-val" onclick="cp('Totalplay-D4B5_EXT_2')">Totalplay-D4B5_EXT_2</span></div>
     <div class="wifi-item"><span class="wifi-name">Recámara 2</span><span class="wifi-val" onclick="cp('Totalplay-D4B5')">Totalplay-D4B5</span></div>
     <div class="wifi-pass"><span class="wifi-pass-l">${L.passAll}</span><span class="wifi-pass-v" onclick="cp('D4B55712gde5SmAq')">D4B55712gde5SmAq</span></div>
+    <div class="qr-box"><canvas id="wifiQr" width="150" height="150"></canvas><div class="qr-label">${L.scanWifi}</div></div>
   </div></div>
 
   <!-- Contact -->
@@ -359,6 +417,13 @@ $("content").innerHTML=`
   <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🍷</div><div class="card-t">${L.bars}</div></div><div class="chev">▼</div></div>
   <div class="card-b">
     <div class="place"><div class="place-name">${mlink("Manada","Manada bar Narvarte CDMX")}</div><div class="place-cat">${isEn?"Natural wines · Cocktails":"Vinos naturales · Coctelería"}</div><div class="place-desc">${L.manadaD}</div><div class="place-meta"><a href="${gm("Manada bar Narvarte CDMX")}" target="_blank">📍 Narvarte</a><span>💰 $$</span></div></div>
+  </div></div>
+
+  <!-- Spotify -->
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🎵</div><div class="card-t">${L.playlist}</div></div><div class="chev">▼</div></div>
+  <div class="card-b">
+    <div style="font-size:12px;color:#525252;margin-bottom:8px">${L.playlistSub}</div>
+    <div class="spotify-embed"><iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX5nwnRMcdReF?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe></div>
   </div></div>
 
   <div class="guide-divider"></div>
@@ -420,7 +485,12 @@ $("content").innerHTML=`
   </div></div>
 
   <div style="text-align:center;padding:24px 0 12px;font-size:12px;color:#2a2a2a;line-height:1.6">✨ ${L.bye}</div>
-</div>`;currentPin=pin}
+</div>`;currentPin=pin;
+// Set countdown data and start
+const cdEl=$("countdown");if(cdEl&&data.checkOut){cdEl.setAttribute("data-co",data.checkOut);updateCountdown();setInterval(updateCountdown,60000)}
+// Draw WiFi QR
+setTimeout(drawWifiQr,500);
+}
 
 function updDoor(s){doorState=s;const c=$("door"),l=$("doorLabel");if(!c||!l)return;c.className="circle "+s;
 const ic={idle:'<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#d4d4d4" stroke-width="1.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',opening:'<div class="spinner"></div>',success:'<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>',error:'<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',rate:'<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'};
@@ -435,6 +505,47 @@ catch(e){updDoor("error");setTimeout(()=>updDoor("idle"),3000)}}
 
 function tog(h){h.nextElementSibling.classList.toggle("open");h.querySelector(".chev").classList.toggle("open")}
 function cp(t){navigator.clipboard.writeText(t).then(()=>{$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),1500)})}
+
+// Theme toggle
+function toggleTheme(){
+  document.body.classList.toggle("light");
+  const isLight=document.body.classList.contains("light");
+  $("themeTog").textContent=isLight?"☀️":"🌙";
+  try{localStorage.setItem("dh_theme",isLight?"light":"dark")}catch(e){}
+}
+(function(){try{if(localStorage.getItem("dh_theme")==="light"){document.body.classList.add("light");$("themeTog").textContent="☀️"}}catch(e){}})();
+
+// Countdown
+function updateCountdown(){
+  const el=$("countdown");if(!el)return;
+  const co=el.getAttribute("data-co");if(!co)return;
+  const now=new Date();const end=new Date(co);
+  const diff=Math.ceil((end-now)/(1000*60*60*24));
+  if(diff<=0){el.innerHTML="🚪 <strong>"+L.lastDay+"</strong>"}
+  else if(diff===1){el.innerHTML="📅 <strong>1</strong> "+L.stayLeft}
+  else{el.innerHTML="📅 <strong>"+diff+"</strong> "+L.stayLeft}
+}
+
+// WiFi QR Code (minimal generator)
+function drawWifiQr(){
+  const canvas=$("wifiQr");if(!canvas)return;
+  const ctx=canvas.getContext("2d");
+  // Draw a simple styled QR placeholder that links to wifi
+  const s=canvas.width;ctx.fillStyle="#fff";ctx.fillRect(0,0,s,s);
+  ctx.fillStyle="#0a0a0a";ctx.font="bold 11px system-ui";ctx.textAlign="center";
+  ctx.fillText("WIFI:T:WPA;S:Totalplay",s/2,s/2-20);
+  ctx.fillText("-D4B5-5G-EXT;",s/2,s/2-5);
+  ctx.fillText("P:D4B55712gde5SmAq;;",s/2,s/2+10);
+  ctx.font="9px system-ui";ctx.fillStyle="#999";
+  ctx.fillText(L.scanWifi,s/2,s/2+30);
+  // Load QR lib dynamically
+  const script=document.createElement("script");
+  script.src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js";
+  script.onload=function(){
+    new QRious({element:canvas,value:"WIFI:T:WPA;S:Totalplay-D4B5-5G-EXT;P:D4B55712gde5SmAq;;",size:150,backgroundAlpha:1,foreground:"#1c1917",background:"#ffffff",level:"M"});
+  };
+  document.head.appendChild(script);
+}
 
 async function init(){
 $("app").classList.add("ready");
