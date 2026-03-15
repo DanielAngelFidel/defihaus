@@ -517,3 +517,21 @@ function drawWifiQr(){
 }
 
 // Theme toggle
+async function init(){
+$("app").classList.add("ready");
+const saved=getPin();
+if(saved){
+  currentPin=saved;
+  try{
+    const r=await fetch(WORKER_URL+"/api/verify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pin:saved})});
+    const d=await r.json();
+    if(d.valid){renderActive(d,saved);return}
+  }catch(e){}
+}
+renderPinEntry();
+}
+setTimeout(init,1300);
+
+</script>
+</body>
+</html>
