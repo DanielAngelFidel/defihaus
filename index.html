@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Defihaus — Acceso</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: #0a0a0a;
+    color: #e5e5e5;
+    font-family: -apple-system, 'SF Pro Display', system-ui, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    user-select: none;
+  }
+  .brand {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: #3a3a3a;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 40px;
+  }
+  .circle {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+  }
+  .circle.idle {
+    background: radial-gradient(circle, #171717 0%, #0f0f0f 50%, #0a0a0a 100%);
+    border: 2px solid #2a2a2a;
+    box-shadow: 0 0 40px rgba(0,0,0,0.4);
+  }
+  .circle.opening {
+    background: radial-gradient(circle, #1e1b4b 0%, #0f0a2e 50%, #0a0a0a 100%);
+    border: 2px solid #818cf8;
+    box-shadow: 0 0 60px rgba(129,140,248,0.15);
+    cursor: default;
+  }
+  .circle.success {
+    background: radial-gradient(circle, #065f46 0%, #064e3b 50%, #0a0a0a 100%);
+    border: 2px solid #34d399;
+    box-shadow: 0 0 80px rgba(52,211,153,0.2);
+    cursor: default;
+  }
+  .circle.error {
+    background: radial-gradient(circle, #2a0a0a 0%, #0a0a0a 100%);
+    border: 2px solid #f87171;
+    box-shadow: 0 0 40px rgba(248,113,113,0.1);
+    cursor: default;
+  }
+  .circle.rate {
+    background: radial-gradient(circle, #2a1a0a 0%, #0a0a0a 100%);
+    border: 2px solid #fb923c;
+    box-shadow: 0 0 40px rgba(251,146,60,0.1);
+    cursor: default;
+  }
+  .circle.inactive {
+    background: radial-gradient(circle, #0f0f0f 0%, #0a0a0a 100%);
+    border: 2px solid #1a1a1a;
+    cursor: default;
+  }
+  .label {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    transition: color 0.3s;
+    text-align: center;
+  }
+  .sublabel {
+    font-size: 11px;
+    color: #3a3a3a;
+  }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 2px solid #2a2a4a;
+    border-top: 2px solid #818cf8;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  .spinner-sm {
+    display: inline-block;
+    width: 18px; height: 18px;
+    border: 2px solid #1a1a1a;
+    border-top: 2px solid #525252;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+  }
+  .loading-text { font-size: 13px; color: #525252; }
+  .retry-btn {
+    margin-top: 16px;
+    padding: 10px 24px;
+    background: #171717;
+    border: 1px solid #262626;
+    border-radius: 8px;
+    color: #737373;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Hide everything until loaded */
+  #app { opacity: 0; transition: opacity 0.3s; }
+  #app.ready { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="brand">Defihaus</div>
+  <div id="content"></div>
+</div>
+
+<script>
+// ============================================================
+// CONFIGURACIÓN — cambia WORKER_URL y ACCESS_KEY
+// ============================================================
+const WORKER_URL = "https://puerta-narvarte.TU-SUBDOMINIO.workers.dev";
+const ACCESS_KEY = "TU-ACCESS-KEY-AQUI"; // la misma que en el Worker
+// ============================================================
+
+const $ = (id) => document.getElementById(id);
+let doorState = "idle";
+
+function renderLoading() {
+  $("content").innerHTML = `
+    <div class="spinner-sm"></div>
+    <div class="loading-text">Verificando acceso...</div>
+  `;
+  $("app").classList.add("ready");
+}
+
+function renderActive(data) {
+  const coDate = data.checkOut ? new Date(data.checkOut).toLocaleDateString("es-MX", {
+    weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit"
+  }) : "";
+
+  $("content").innerHTML = `
+    ${data.guest ? `<div style="font-size:14px;color:#525252;margin-bottom:28px">Bienvenido</div>` : ""}
+    <div class="circle idle" id="door" onclick="openDoor()">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#d4d4d4" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+    <div class="label" id="doorLabel" style="color:#e5e5e5">Toca para abrir</div>
+    ${coDate ? `<div class="sublabel">Acceso hasta ${coDate}</div>` : ""}
+  `;
+}
+
+function renderInactive() {
+  $("content").innerHTML = `
+    <div class="circle inactive">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2a2a2a" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 5-5v0a5 5 0 0 1 5 5v4"/>
+      </svg>
+    </div>
+    <div class="label" style="color:#525252">Acceso no disponible</div>
+    <div class="sublabel">No hay reserva activa en este momento</div>
+  `;
+}
+
+function renderError() {
+  $("content").innerHTML = `
+    <div class="label" style="color:#525252">No se pudo verificar el acceso</div>
+    <button class="retry-btn" onclick="location.reload()">Reintentar</button>
+  `;
+}
+
+function updateDoor(state) {
+  doorState = state;
+  const circle = $("door");
+  const label = $("doorLabel");
+  if (!circle || !label) return;
+
+  circle.className = "circle " + state;
+
+  const icons = {
+    idle: `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#d4d4d4" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+    opening: `<div class="spinner"></div>`,
+    success: `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+    error: `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+    rate: `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+  };
+
+  const labels = {
+    idle: { text: "Toca para abrir", color: "#e5e5e5" },
+    opening: { text: "Abriendo...", color: "#818cf8" },
+    success: { text: "Puerta abierta", color: "#34d399" },
+    error: { text: "Error — intenta de nuevo", color: "#f87171" },
+    rate: { text: "Espera un momento", color: "#fb923c" },
+  };
+
+  circle.innerHTML = icons[state] || icons.idle;
+  label.textContent = labels[state]?.text || "";
+  label.style.color = labels[state]?.color || "#e5e5e5";
+}
+
+async function openDoor() {
+  if (doorState !== "idle") return;
+  updateDoor("opening");
+
+  try {
+    const res = await fetch(WORKER_URL + "/api/open", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key: ACCESS_KEY }),
+    });
+
+    if (res.status === 429) {
+      updateDoor("rate");
+      setTimeout(() => updateDoor("idle"), 5000);
+      return;
+    }
+
+    const data = await res.json();
+    if (data.success) {
+      updateDoor("success");
+      setTimeout(() => updateDoor("idle"), 4000);
+    } else {
+      updateDoor("error");
+      setTimeout(() => updateDoor("idle"), 3000);
+    }
+  } catch {
+    updateDoor("error");
+    setTimeout(() => updateDoor("idle"), 3000);
+  }
+}
+
+// Init
+async function init() {
+  renderLoading();
+  try {
+    const res = await fetch(WORKER_URL + "/api/status?key=" + ACCESS_KEY);
+    const data = await res.json();
+    if (data.active) {
+      renderActive(data);
+    } else {
+      renderInactive();
+    }
+  } catch {
+    renderError();
+  }
+}
+
+init();
+</script>
+</body>
+</html>
