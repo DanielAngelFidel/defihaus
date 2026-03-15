@@ -25,9 +25,7 @@ body{background:#0a0a0a;color:#e5e5e5;font-family:'DM Sans',-apple-system,system
 @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.05);opacity:.8}}
 
 .brand{font-size:10px;letter-spacing:4px;color:#3a3a3a;text-transform:uppercase;font-weight:600;text-align:center;padding:48px 0 32px}
-#content{display:flex;flex-direction:column;align-items:center;padding:0 20px}
-
-/* Door */
+#content{padding:0 20px}
 .door-section{display:flex;flex-direction:column;align-items:center;margin-bottom:20px}
 .circle{width:180px;height:180px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:24px;transition:all .5s cubic-bezier(.4,0,.2,1);cursor:pointer}
 .circle.idle{background:radial-gradient(circle,#171717,#0f0f0f 50%,#0a0a0a);border:2px solid #2a2a2a;box-shadow:0 0 40px rgba(0,0,0,.4)}
@@ -44,7 +42,7 @@ body{background:#0a0a0a;color:#e5e5e5;font-family:'DM Sans',-apple-system,system
 #app.ready{opacity:1}
 
 /* PIN */
-.pin-container{text-align:center;width:100%;max-width:320px}
+.pin-container{text-align:center;width:100%;max-width:320px;margin:0 auto}
 .pin-icon{width:72px;height:72px;border-radius:50%;background:#141414;border:1px solid #1f1f1f;display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
 .pin-title{font-size:16px;font-weight:600;color:#d4d4d4;margin-bottom:6px}
 .pin-sub{font-size:13px;color:#525252;margin-bottom:24px}
