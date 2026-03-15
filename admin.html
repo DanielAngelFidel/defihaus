@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Defihaus Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#e5e5e5;font-family:'DM Sans',system-ui,sans-serif;min-height:100vh;padding:24px}
+.c{max-width:480px;margin:0 auto}
+.brand{font-size:10px;letter-spacing:4px;color:#3a3a3a;text-transform:uppercase;font-weight:600;margin-bottom:6px}
+h1{font-size:22px;font-weight:700;margin-bottom:24px}
+.login{text-align:center;padding:80px 0}
+.login input{width:200px;padding:14px;background:#141414;border:1px solid #262626;border-radius:10px;color:#e5e5e5;font-size:20px;text-align:center;letter-spacing:6px;outline:none;font-family:'JetBrains Mono',monospace;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto}
+.login button{width:200px;padding:14px;background:#e5e5e5;color:#0a0a0a;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
+.reservation{background:#141414;border:1px solid #1f1f1f;border-radius:12px;padding:16px;margin-bottom:10px}
+.res-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.res-guest{font-size:15px;font-weight:600}
+.res-badge{font-size:10px;font-weight:600;padding:3px 10px;border-radius:5px}
+.badge-active{background:#052e16;color:#4ade80}
+.badge-upcoming{background:#1e1b4b;color:#818cf8}
+.badge-expired{background:#1c1917;color:#78716c}
+.res-dates{font-size:12px;color:#737373;margin-bottom:10px}
+.res-pin{display:flex;align-items:center;justify-content:space-between;background:#1a1a1a;padding:10px 14px;border-radius:8px}
+.res-pin-label{font-size:11px;color:#525252}
+.res-pin-value{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#fbbf24;letter-spacing:4px}
+.res-pin-copy{background:#262626;border:none;color:#a3a3a3;padding:6px 12px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit}
+.res-msg{margin-top:8px}
+.res-msg button{width:100%;padding:10px;background:#262626;border:none;border-radius:8px;color:#a3a3a3;font-size:12px;cursor:pointer;font-family:inherit}
+.section-title{font-size:11px;color:#525252;text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px}
+.open-btn{width:100%;padding:14px;background:#1a3a2a;border:1px solid #22c55e;border-radius:10px;color:#4ade80;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:20px;font-family:inherit}
+.log{background:#141414;border:1px solid #1f1f1f;border-radius:8px;padding:10px 14px;margin-bottom:6px;font-size:12px;color:#737373;display:flex;justify-content:space-between}
+.log-time{font-family:'JetBrains Mono',monospace;font-size:11px;color:#525252}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#34d399;color:#0a0a0a;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:100}
+.toast.show{opacity:1}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid #1a1a1a;border-top:2px solid #525252;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{color:#f87171;font-size:13px;margin-top:8px;text-align:center}
+</style>
+</head>
+<body>
+<div class="c" id="app"></div>
+<div class="toast" id="toast">Copiado</div>
+<script>
+const WORKER="https://puerta-narvarte.danielangelfidel.workers.dev";
+const KEY="dh-narv-2026-secreto";
+const $=id=>document.getElementById(id);
+let logs=JSON.parse(localStorage.getItem("dh_logs")||"[]");
+
+function renderLogin(){
+$("app").innerHTML=`
+<div class="login">
+  <div class="brand">Defihaus Admin</div>
+  <div style="font-size:16px;font-weight:600;margin-bottom:20px;color:#d4d4d4">PIN de administrador</div>
+  <input type="password" id="pin" placeholder="••••" maxlength="20">
+  <button onclick="login()">Entrar</button>
+  <div class="err" id="err"></div>
+</div>`;
+$("pin").focus();
+$("pin").addEventListener("keydown",e=>{if(e.key==="Enter")login()});
+}
+
+function login(){
+  if($("pin").value===KEY){renderDashboard()}
+  else{$("err").textContent="PIN incorrecto"}
+}
+
+async function renderDashboard(){
+$("app").innerHTML='<div class="brand">Defihaus</div><h1>Admin Dashboard</h1><div style="text-align:center"><div class="spinner"></div><div style="font-size:12px;color:#525252;margin-top:8px">Cargando reservas...</div></div>';
+try{
+  const r=await fetch(WORKER+"/api/admin/pins?key="+KEY);
+  const d=await r.json();
+  let html='<div class="brand">Defihaus</div><h1>Admin Dashboard</h1>';
+  
+  // Open door button (admin override)
+  html+='<button class="open-btn" id="openBtn" onclick="adminOpen()">🔓 Abrir puerta (admin)</button>';
+  
+  // Active reservations
+  const active=d.reservations.filter(r=>r.active);
+  const upcoming=d.reservations.filter(r=>!r.active&&new Date(r.checkIn)>new Date());
+  
+  if(active.length){
+    html+='<div class="section-title">Reserva activa</div>';
+    active.forEach(r=>{html+=renderRes(r,"active")});
+  }
+  if(upcoming.length){
+    html+='<div class="section-title">Próximas reservas</div>';
+    upcoming.forEach(r=>{html+=renderRes(r,"upcoming")});
+  }
+  if(!active.length&&!upcoming.length){
+    html+='<div style="text-align:center;padding:40px 0;color:#525252">No hay reservas activas ni próximas</div>';
+  }
+  
+  // Open logs
+  if(logs.length){
+    html+='<div class="section-title">Últimas aperturas</div>';
+    logs.slice(0,20).forEach(l=>{
+      html+='<div class="log"><span>'+l.guest+'</span><span class="log-time">'+l.time+'</span></div>';
+    });
+  }
+  
+  $("app").innerHTML=html;
+}catch(e){
+  $("app").innerHTML='<div class="brand">Defihaus</div><h1>Admin</h1><div class="err">Error al cargar: '+e.message+'</div>';
+}
+}
+
+function renderRes(r,type){
+const badge=type==="active"?'<span class="res-badge badge-active">ACTIVO</span>':'<span class="res-badge badge-upcoming">PRÓXIMO</span>';
+const ci=new Date(r.checkIn).toLocaleDateString("es-MX",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+const co=new Date(r.checkOut).toLocaleDateString("es-MX",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+const msg=encodeURIComponent("¡Hola!\\n\\nTu PIN de acceso para abrir la puerta del edificio es:\\n\\n🔑 "+r.pin+"\\n\\nÚsalo en este link:\\n👉 narvarte1.romanortehost.com\\n\\n¡Que disfrutes tu estancia!");
+return`<div class="reservation">
+<div class="res-header"><span class="res-guest">${r.guest}</span>${badge}</div>
+<div class="res-dates">📅 ${ci} → ${co}</div>
+<div class="res-pin">
+  <div><div class="res-pin-label">PIN</div><div class="res-pin-value">${r.pin}</div></div>
+  <button class="res-pin-copy" onclick="cp('${r.pin}')">Copiar</button>
+</div>
+<div class="res-msg"><button onclick="cpMsg('${r.guest}','${r.pin}')">📋 Copiar mensaje completo para Airbnb</button></div>
+</div>`;
+}
+
+async function adminOpen(){
+const btn=$("openBtn");
+btn.textContent="🔓 Abriendo...";btn.disabled=true;
+try{
+  const r=await fetch(WORKER+"/api/open",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({key:KEY})});
+  const d=await r.json();
+  if(d.success){
+    btn.textContent="✅ Puerta abierta";btn.style.borderColor="#34d399";
+    const now=new Date().toLocaleString("es-MX",{timeZone:"America/Mexico_City",hour:"2-digit",minute:"2-digit",day:"numeric",month:"short"});
+    logs.unshift({guest:"Admin",time:now});
+    localStorage.setItem("dh_logs",JSON.stringify(logs.slice(0,50)));
+    setTimeout(()=>{btn.textContent="🔓 Abrir puerta (admin)";btn.disabled=false;btn.style.borderColor="#22c55e"},3000);
+  }else{
+    btn.textContent="❌ Error";setTimeout(()=>{btn.textContent="🔓 Abrir puerta (admin)";btn.disabled=false},2000);
+  }
+}catch(e){btn.textContent="❌ Error";setTimeout(()=>{btn.textContent="🔓 Abrir puerta (admin)";btn.disabled=false},2000)}
+}
+
+function cp(t){navigator.clipboard.writeText(t).then(()=>{$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),1500)})}
+
+function cpMsg(guest,pin){
+const msg=`¡Hola!
+
+Tu PIN de acceso para abrir la puerta del edificio es:
+
+🔑 ${pin}
+
+Úsalo en este link:
+👉 narvarte1.romanortehost.com
+
+¡Que disfrutes tu estancia!`;
+navigator.clipboard.writeText(msg).then(()=>{$("toast").textContent="Mensaje copiado";$("toast").classList.add("show");setTimeout(()=>{$("toast").classList.remove("show");$("toast").textContent="Copiado"},2000)})
+}
+
+renderLogin();
+</script>
+</body>
+</html>

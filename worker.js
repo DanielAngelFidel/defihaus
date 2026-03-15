@@ -136,6 +136,15 @@ export default {
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
           body: new URLSearchParams({ auth_key: env.SHELLY_AUTH_KEY, id: env.SHELLY_DEVICE_ID, channel: "0", turn: "on" }),
         });
+        // Send push notification if configured
+        if (res.ok && env.NTFY_TOPIC) {
+          const now = new Date().toLocaleString("es-MX", { timeZone: "America/Mexico_City" });
+          fetch("https://ntfy.sh/" + env.NTFY_TOPIC, {
+            method: "POST",
+            headers: { "Title": "Puerta abierta - Narvarte", "Tags": "door,key" },
+            body: (status.guest || "Huésped") + " abrió la puerta\n" + now,
+          }).catch(() => {});
+        }
         return new Response(JSON.stringify({ success: res.ok }), { status: res.ok ? 200 : 500, headers: CORS });
       }
 
