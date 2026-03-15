@@ -19,103 +19,37 @@
     padding: 60px 24px 40px;
     user-select: none;
   }
-  .brand {
-    font-size: 10px;
-    letter-spacing: 4px;
-    color: #3a3a3a;
-    text-transform: uppercase;
-    font-weight: 600;
-    margin-bottom: 40px;
-  }
-  .circle {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 28px;
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-  }
-  .circle.idle {
-    background: radial-gradient(circle, #171717 0%, #0f0f0f 50%, #0a0a0a 100%);
-    border: 2px solid #2a2a2a;
-    box-shadow: 0 0 40px rgba(0,0,0,0.4);
-  }
-  .circle.opening {
-    background: radial-gradient(circle, #1e1b4b 0%, #0f0a2e 50%, #0a0a0a 100%);
-    border: 2px solid #818cf8;
-    box-shadow: 0 0 60px rgba(129,140,248,0.15);
-    cursor: default;
-  }
-  .circle.success {
-    background: radial-gradient(circle, #065f46 0%, #064e3b 50%, #0a0a0a 100%);
-    border: 2px solid #34d399;
-    box-shadow: 0 0 80px rgba(52,211,153,0.2);
-    cursor: default;
-  }
-  .circle.error {
-    background: radial-gradient(circle, #2a0a0a 0%, #0a0a0a 100%);
-    border: 2px solid #f87171;
-    box-shadow: 0 0 40px rgba(248,113,113,0.1);
-    cursor: default;
-  }
-  .circle.rate {
-    background: radial-gradient(circle, #2a1a0a 0%, #0a0a0a 100%);
-    border: 2px solid #fb923c;
-    box-shadow: 0 0 40px rgba(251,146,60,0.1);
-    cursor: default;
-  }
-  .circle.inactive {
-    background: radial-gradient(circle, #0f0f0f 0%, #0a0a0a 100%);
-    border: 2px solid #1a1a1a;
-    cursor: default;
-  }
-  .label {
-    font-size: 17px;
-    font-weight: 600;
-    margin-bottom: 8px;
-    transition: color 0.3s;
-    text-align: center;
-  }
-  .sublabel {
-    font-size: 11px;
-    color: #3a3a3a;
-  }
-  .spinner {
-    width: 40px; height: 40px;
-    border: 2px solid #2a2a4a;
-    border-top: 2px solid #818cf8;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-  }
-  .spinner-sm {
-    display: inline-block;
-    width: 18px; height: 18px;
-    border: 2px solid #1a1a1a;
-    border-top: 2px solid #525252;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 16px;
-  }
+  .brand { font-size: 10px; letter-spacing: 4px; color: #3a3a3a; text-transform: uppercase; font-weight: 600; margin-bottom: 40px; }
+  .circle { width: 200px; height: 200px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 28px; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+  .circle.idle { background: radial-gradient(circle, #171717 0%, #0f0f0f 50%, #0a0a0a 100%); border: 2px solid #2a2a2a; box-shadow: 0 0 40px rgba(0,0,0,0.4); }
+  .circle.opening { background: radial-gradient(circle, #1e1b4b 0%, #0f0a2e 50%, #0a0a0a 100%); border: 2px solid #818cf8; box-shadow: 0 0 60px rgba(129,140,248,0.15); cursor: default; }
+  .circle.success { background: radial-gradient(circle, #065f46 0%, #064e3b 50%, #0a0a0a 100%); border: 2px solid #34d399; box-shadow: 0 0 80px rgba(52,211,153,0.2); cursor: default; }
+  .circle.error { background: radial-gradient(circle, #2a0a0a 0%, #0a0a0a 100%); border: 2px solid #f87171; box-shadow: 0 0 40px rgba(248,113,113,0.1); cursor: default; }
+  .circle.rate { background: radial-gradient(circle, #2a1a0a 0%, #0a0a0a 100%); border: 2px solid #fb923c; box-shadow: 0 0 40px rgba(251,146,60,0.1); cursor: default; }
+  .circle.inactive { background: radial-gradient(circle, #0f0f0f 0%, #0a0a0a 100%); border: 2px solid #1a1a1a; cursor: default; }
+  .label { font-size: 17px; font-weight: 600; margin-bottom: 8px; transition: color 0.3s; text-align: center; }
+  .sublabel { font-size: 11px; color: #3a3a3a; }
+  .spinner { width: 40px; height: 40px; border: 2px solid #2a2a4a; border-top: 2px solid #818cf8; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  .spinner-sm { display: inline-block; width: 18px; height: 18px; border: 2px solid #1a1a1a; border-top: 2px solid #525252; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 16px; }
   .loading-text { font-size: 13px; color: #525252; }
-  .retry-btn {
-    margin-top: 16px;
-    padding: 10px 24px;
-    background: #171717;
-    border: 1px solid #262626;
-    border-radius: 8px;
-    color: #737373;
-    font-size: 13px;
-    cursor: pointer;
-  }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* Hide everything until loaded */
   #app { opacity: 0; transition: opacity 0.3s; }
   #app.ready { opacity: 1; }
 
+  /* PIN entry */
+  .pin-container { text-align: center; width: 100%; max-width: 320px; }
+  .pin-title { font-size: 16px; font-weight: 600; color: #d4d4d4; margin-bottom: 6px; }
+  .pin-sub { font-size: 13px; color: #525252; margin-bottom: 28px; }
+  .pin-inputs { display: flex; gap: 8px; justify-content: center; margin-bottom: 24px; }
+  .pin-digit { width: 48px; height: 56px; background: #141414; border: 1px solid #262626; border-radius: 10px; color: #e5e5e5; font-size: 24px; text-align: center; outline: none; font-family: 'Courier New', monospace; font-weight: 700; -webkit-appearance: none; }
+  .pin-digit:focus { border-color: #525252; }
+  .pin-digit.error { border-color: #f87171; }
+  .pin-btn { width: 100%; padding: 16px; background: #e5e5e5; color: #0a0a0a; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .pin-btn:disabled { background: #1a1a1a; color: #3a3a3a; cursor: default; }
+  .pin-error { font-size: 13px; color: #f87171; margin-top: 12px; }
+  .pin-icon { width: 80px; height: 80px; border-radius: 50%; background: #141414; border: 1px solid #1f1f1f; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; }
+
+  /* Info cards */
   .info-section { width: 100%; max-width: 380px; margin-top: 40px; }
   .info-card { background: #141414; border: 1px solid #1f1f1f; border-radius: 14px; margin-bottom: 10px; overflow: hidden; }
   .info-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; }
@@ -141,7 +75,6 @@
 </style>
 </head>
 <body>
-
 <div id="app">
   <div class="brand">Defihaus</div>
   <div id="content"></div>
@@ -149,31 +82,112 @@
 <div class="copy-toast" id="toast">Copiado</div>
 
 <script>
-// ============================================================
-// CONFIGURACIÓN — cambia WORKER_URL y ACCESS_KEY
-// ============================================================
 const WORKER_URL = "https://puerta-narvarte.danielangelfidel.workers.dev";
-const ACCESS_KEY = "dh-narv-2026-secreto"; // la misma que en el Worker
-// ============================================================
+const ACCESS_KEY = "dh-narv-2026-secreto";
 
 const $ = (id) => document.getElementById(id);
 let doorState = "idle";
+let currentPin = "";
 
 function renderLoading() {
-  $("content").innerHTML = `
-    <div class="spinner-sm"></div>
-    <div class="loading-text">Verificando acceso...</div>
-  `;
+  $("content").innerHTML = '<div class="spinner-sm"></div><div class="loading-text">Cargando...</div>';
   $("app").classList.add("ready");
 }
 
-function renderActive(data) {
+// ---- PIN ENTRY SCREEN ----
+function renderPinEntry() {
+  $("content").innerHTML = `
+    <div class="pin-container">
+      <div class="pin-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 5-5v0a5 5 0 0 1 5 5v4"/>
+        </svg>
+      </div>
+      <div class="pin-title">Ingresa tu PIN de acceso</div>
+      <div class="pin-sub">Recibiste un PIN de 6 dígitos en tu mensaje de Airbnb</div>
+      <div class="pin-inputs">
+        <input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="0" autofocus>
+        <input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="1">
+        <input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="2">
+        <input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="3">
+        <input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="4">
+        <input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="5">
+      </div>
+      <button class="pin-btn" id="pinBtn" onclick="verifyPin()" disabled>Verificar</button>
+      <div class="pin-error" id="pinError"></div>
+    </div>
+  `;
+
+  const digits = document.querySelectorAll(".pin-digit");
+  digits.forEach((d, i) => {
+    d.addEventListener("input", (e) => {
+      d.value = d.value.replace(/[^0-9]/g, "");
+      if (d.value && i < 5) digits[i+1].focus();
+      updatePinBtn();
+    });
+    d.addEventListener("keydown", (e) => {
+      if (e.key === "Backspace" && !d.value && i > 0) { digits[i-1].focus(); digits[i-1].value = ""; }
+    });
+    d.addEventListener("paste", (e) => {
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData).getData("text").replace(/[^0-9]/g, "");
+      for (let j = 0; j < Math.min(text.length, 6); j++) {
+        digits[j].value = text[j];
+      }
+      if (text.length >= 6) digits[5].focus();
+      updatePinBtn();
+    });
+  });
+}
+
+function updatePinBtn() {
+  const digits = document.querySelectorAll(".pin-digit");
+  const pin = Array.from(digits).map(d => d.value).join("");
+  $("pinBtn").disabled = pin.length !== 6;
+  currentPin = pin;
+}
+
+async function verifyPin() {
+  $("pinBtn").disabled = true;
+  $("pinBtn").textContent = "Verificando...";
+  $("pinError").textContent = "";
+
+  try {
+    const res = await fetch(WORKER_URL + "/api/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pin: currentPin }),
+    });
+    const data = await res.json();
+    if (data.valid) {
+      renderActive(data, currentPin);
+    } else if (data.error === "wrong_pin") {
+      $("pinError").textContent = "PIN incorrecto. Verifica e intenta de nuevo.";
+      document.querySelectorAll(".pin-digit").forEach(d => { d.classList.add("error"); d.value = ""; });
+      document.querySelector(".pin-digit").focus();
+      $("pinBtn").textContent = "Verificar";
+    } else if (data.error === "no_reservation") {
+      $("pinError").textContent = "No hay reserva activa en este momento.";
+      $("pinBtn").textContent = "Verificar";
+    } else {
+      $("pinError").textContent = "Error. Intenta de nuevo.";
+      $("pinBtn").textContent = "Verificar";
+    }
+  } catch {
+    $("pinError").textContent = "Error de conexión. Intenta de nuevo.";
+    $("pinBtn").textContent = "Verificar";
+  }
+}
+
+// ---- DOOR + INFO SCREEN ----
+function renderActive(data, pin) {
   const coDate = data.checkOut ? new Date(data.checkOut).toLocaleDateString("es-MX", {
     weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit"
   }) : "";
 
   $("content").innerHTML = `
-    ${data.guest ? `<div style="font-size:14px;color:#525252;margin-bottom:28px">Bienvenido</div>` : ""}
+    <div style="font-size:14px;color:#525252;margin-bottom:28px">Bienvenido</div>
     <div class="circle idle" id="door" onclick="openDoor()">
       <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#d4d4d4" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
@@ -181,46 +195,24 @@ function renderActive(data) {
       </svg>
     </div>
     <div class="label" id="doorLabel" style="color:#e5e5e5">Toca para abrir</div>
-    ${coDate ? `<div class="sublabel">Acceso hasta ${coDate}</div>` : ""}
+    ${coDate ? '<div class="sublabel">Acceso hasta ' + coDate + '</div>' : ""}
 
     <div class="info-section">
-
-      <!-- WiFi -->
       <div class="info-card">
         <div class="info-header" onclick="toggleCard(this)">
-          <div class="info-header-left">
-            <div class="info-icon">📶</div>
-            <div class="info-title">WiFi</div>
-          </div>
+          <div class="info-header-left"><div class="info-icon">📶</div><div class="info-title">WiFi</div></div>
           <div class="info-chevron">▼</div>
         </div>
         <div class="info-body">
-          <div class="wifi-item">
-            <span class="wifi-name">Red general</span>
-            <span class="wifi-value" onclick="copyText('Totalplay-D4B5-5G-EXT')">Totalplay-D4B5-5G-EXT</span>
-          </div>
-          <div class="wifi-item">
-            <span class="wifi-name">Recámara 1</span>
-            <span class="wifi-value" onclick="copyText('Totalplay-D4B5_EXT_2')">Totalplay-D4B5_EXT_2</span>
-          </div>
-          <div class="wifi-item">
-            <span class="wifi-name">Recámara 2</span>
-            <span class="wifi-value" onclick="copyText('Totalplay-D4B5')">Totalplay-D4B5</span>
-          </div>
-          <div class="wifi-pass">
-            <span class="wifi-pass-label">Contraseña (todas)</span>
-            <span class="wifi-pass-value" onclick="copyText('D4B55712gde5SmAq')">D4B55712gde5SmAq</span>
-          </div>
+          <div class="wifi-item"><span class="wifi-name">Red general</span><span class="wifi-value" onclick="copyText('Totalplay-D4B5-5G-EXT')">Totalplay-D4B5-5G-EXT</span></div>
+          <div class="wifi-item"><span class="wifi-name">Recámara 1</span><span class="wifi-value" onclick="copyText('Totalplay-D4B5_EXT_2')">Totalplay-D4B5_EXT_2</span></div>
+          <div class="wifi-item"><span class="wifi-name">Recámara 2</span><span class="wifi-value" onclick="copyText('Totalplay-D4B5')">Totalplay-D4B5</span></div>
+          <div class="wifi-pass"><span class="wifi-pass-label">Contraseña (todas)</span><span class="wifi-pass-value" onclick="copyText('D4B55712gde5SmAq')">D4B55712gde5SmAq</span></div>
         </div>
       </div>
-
-      <!-- Reglas -->
       <div class="info-card">
         <div class="info-header" onclick="toggleCard(this)">
-          <div class="info-header-left">
-            <div class="info-icon">📋</div>
-            <div class="info-title">Reglas de la casa</div>
-          </div>
+          <div class="info-header-left"><div class="info-icon">📋</div><div class="info-title">Reglas de la casa</div></div>
           <div class="info-chevron">▼</div>
         </div>
         <div class="info-body">
@@ -235,34 +227,14 @@ function renderActive(data) {
           <div class="rule-item"><span class="rule-emoji">🏡</span><span class="rule-text">Cuida nuestra casa como si fuera tuya. Evita dañar o romper cualquier objeto.</span></div>
         </div>
       </div>
-
-      <!-- Bienvenida -->
       <div style="text-align:center;margin-top:16px;padding:12px;font-size:12px;color:#3a3a3a;line-height:1.6">
         ✨ Agradecemos tu respeto y colaboración.<br>¡Te deseamos una estancia muy agradable!
       </div>
-
     </div>
   `;
-}
 
-function renderInactive() {
-  $("content").innerHTML = `
-    <div class="circle inactive">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2a2a2a" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-        <path d="M7 11V7a5 5 0 0 1 5-5v0a5 5 0 0 1 5 5v4"/>
-      </svg>
-    </div>
-    <div class="label" style="color:#525252">Acceso no disponible</div>
-    <div class="sublabel">No hay reserva activa en este momento</div>
-  `;
-}
-
-function renderError() {
-  $("content").innerHTML = `
-    <div class="label" style="color:#525252">No se pudo verificar el acceso</div>
-    <button class="retry-btn" onclick="location.reload()">Reintentar</button>
-  `;
+  // Store pin for door opening
+  currentPin = pin;
 }
 
 function updateDoor(state) {
@@ -270,17 +242,14 @@ function updateDoor(state) {
   const circle = $("door");
   const label = $("doorLabel");
   if (!circle || !label) return;
-
   circle.className = "circle " + state;
-
   const icons = {
-    idle: `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#d4d4d4" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
-    opening: `<div class="spinner"></div>`,
-    success: `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
-    error: `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
-    rate: `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+    idle: '<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#d4d4d4" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+    opening: '<div class="spinner"></div>',
+    success: '<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    error: '<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    rate: '<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
   };
-
   const labels = {
     idle: { text: "Toca para abrir", color: "#e5e5e5" },
     opening: { text: "Abriendo...", color: "#818cf8" },
@@ -288,75 +257,45 @@ function updateDoor(state) {
     error: { text: "Error — intenta de nuevo", color: "#f87171" },
     rate: { text: "Espera un momento", color: "#fb923c" },
   };
-
   circle.innerHTML = icons[state] || icons.idle;
-  label.textContent = labels[state]?.text || "";
-  label.style.color = labels[state]?.color || "#e5e5e5";
+  label.textContent = labels[state] ? labels[state].text : "";
+  label.style.color = labels[state] ? labels[state].color : "#e5e5e5";
 }
 
 async function openDoor() {
   if (doorState !== "idle") return;
   updateDoor("opening");
-
   try {
     const res = await fetch(WORKER_URL + "/api/open", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ key: ACCESS_KEY }),
+      body: JSON.stringify({ pin: currentPin }),
     });
-
-    if (res.status === 429) {
-      updateDoor("rate");
-      setTimeout(() => updateDoor("idle"), 5000);
-      return;
-    }
-
+    if (res.status === 429) { updateDoor("rate"); setTimeout(() => updateDoor("idle"), 5000); return; }
     const data = await res.json();
-    if (data.success) {
-      updateDoor("success");
-      setTimeout(() => updateDoor("idle"), 4000);
-    } else {
-      updateDoor("error");
-      setTimeout(() => updateDoor("idle"), 3000);
-    }
-  } catch {
-    updateDoor("error");
-    setTimeout(() => updateDoor("idle"), 3000);
-  }
+    if (data.success) { updateDoor("success"); setTimeout(() => updateDoor("idle"), 4000); }
+    else { updateDoor("error"); setTimeout(() => updateDoor("idle"), 3000); }
+  } catch { updateDoor("error"); setTimeout(() => updateDoor("idle"), 3000); }
 }
-
-// Init
-async function init() {
-  renderLoading();
-  try {
-    const res = await fetch(WORKER_URL + "/api/status?key=" + ACCESS_KEY);
-    const data = await res.json();
-    if (data.active) {
-      renderActive(data);
-    } else {
-      renderInactive();
-    }
-  } catch {
-    renderError();
-  }
-}
-
-init();
 
 function toggleCard(header) {
-  const body = header.nextElementSibling;
-  const chevron = header.querySelector('.info-chevron');
-  body.classList.toggle('open');
-  chevron.classList.toggle('open');
+  header.nextElementSibling.classList.toggle('open');
+  header.querySelector('.info-chevron').classList.toggle('open');
 }
 
 function copyText(text) {
   navigator.clipboard.writeText(text).then(() => {
-    const toast = $("toast");
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 1500);
+    $("toast").classList.add("show");
+    setTimeout(() => $("toast").classList.remove("show"), 1500);
   });
 }
+
+// ---- INIT ----
+function init() {
+  renderLoading();
+  setTimeout(() => { renderPinEntry(); }, 500);
+}
+init();
 </script>
 </body>
 </html>
