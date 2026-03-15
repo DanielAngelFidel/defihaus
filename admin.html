@@ -110,7 +110,7 @@ function renderRes(r,type){
 const badge=type==="active"?'<span class="res-badge badge-active">ACTIVO</span>':'<span class="res-badge badge-upcoming">PRÓXIMO</span>';
 const ci=new Date(r.checkIn).toLocaleDateString("es-MX",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
 const co=new Date(r.checkOut).toLocaleDateString("es-MX",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
-const msg=encodeURIComponent("¡Hola!\\n\\nTu PIN de acceso para abrir la puerta del edificio es:\\n\\n🔑 "+r.pin+"\\n\\nÚsalo en este link:\\n👉 narvarte1.romanortehost.com\\n\\n¡Que disfrutes tu estancia!");
+const msg=encodeURIComponent("¡Hola!\\n\\nTu PIN de acceso para abrir la puerta del edificio es:\\n\\n🔑 "+r.pin+"\\n\\nÚsalo en este link:\\n👉 narvarte2.romanortehost.com\\n\\n¡Que disfrutes tu estancia!");
 return`<div class="reservation">
 <div class="res-header"><span class="res-guest">${r.guest}</span>${badge}</div>
 <div class="res-dates">📅 ${ci} → ${co}</div>
@@ -150,7 +150,7 @@ Tu PIN de acceso para abrir la puerta del edificio es:
 🔑 ${pin}
 
 Úsalo en este link:
-👉 narvarte1.romanortehost.com
+👉 narvarte2.romanortehost.com
 
 ¡Que disfrutes tu estancia!`;
 navigator.clipboard.writeText(msg).then(()=>{$("toast").textContent="Mensaje copiado";$("toast").classList.add("show");setTimeout(()=>{$("toast").classList.remove("show");$("toast").textContent="Copiado"},2000)})
