@@ -124,20 +124,6 @@ body{background:#0a0a0a;color:#e5e5e5;font-family:'DM Sans',-apple-system,system
 .time-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:#141414;border:1px solid #1f1f1f;border-radius:8px;font-size:11px;color:#737373;margin:4px}
 
 /* Theme toggle */
-.theme-tog{position:fixed;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:#141414;border:1px solid #1f1f1f;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:50;font-size:14px}
-body.light{background:#f5f5f4;color:#1c1917}
-body.light .brand,body.light .sublabel,body.light .chev,body.light .place-meta,body.light .place-meta a,body.light .qr-label{color:#a8a29e}
-body.light .card,body.light .time-badge,body.light .countdown,body.light .pin-digit,body.light .theme-tog,body.light .map-embed{background:#fff;border-color:#e7e5e4}
-body.light .card-t,body.light .place-name,body.light .place-name a,body.light .label,body.light .pin-title,body.light .metro-station a,body.light .tip strong,body.light .emergency-info div:first-child,body.light .guide-hero h2{color:#1c1917}
-body.light .card-ico,body.light .wifi-val,body.light .wifi-pass,body.light .emergency,body.light .pin-icon{background:#f5f5f4}
-body.light .card-badge,body.light .pin-sub,body.light .wifi-name,body.light .emergency-info div:last-child{color:#78716c}
-body.light .place-desc,body.light .tip,body.light .rule span,body.light .metro-station{color:#57534e}
-body.light .wifi-pass-v{color:#059669}
-body.light .countdown strong{color:#d97706}
-body.light .guide-divider{background:linear-gradient(90deg,transparent,#d6d3d1,transparent)}
-body.light .pin-digit{color:#1c1917}
-body.light .toast{background:#059669}
-body.light .tip,body.light .wifi-item,body.light .place,body.light .metro-station{border-color:#e7e5e4}
 
 /* Countdown */
 .countdown{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#141414;border:1px solid #1f1f1f;border-radius:10px;margin-bottom:16px;font-size:12px;color:#a3a3a3}
@@ -149,7 +135,6 @@ body.light .tip,body.light .wifi-item,body.light .place,body.light .metro-statio
 
 /* Uber */
 .uber-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:#000;border:1px solid #262626;border-radius:12px;color:#fff;font-size:13px;font-weight:600;text-decoration:none;margin:6px 0}
-body.light .uber-btn{background:#1c1917}
 
 /* Spotify */
 .spotify-embed{border-radius:12px;overflow:hidden;margin:8px 0}
@@ -170,7 +155,6 @@ body.light .uber-btn{background:#1c1917}
 </div>
 
 <div id="app">
-  <div class="theme-tog" id="themeTog" onclick="toggleTheme()">🌙</div>
   <div class="brand">Defihaus · Narvarte</div>
   <div id="content"></div>
 </div>
@@ -349,7 +333,7 @@ $("content").innerHTML=`
 <div class="guide">
 
   <!-- Uber -->
-  <a class="uber-btn" href="https://m.uber.com/ul/?action=setPickup&dropoff[formatted_address]=Xochicalco+26,+Narvarte,+CDMX&dropoff[latitude]=19.3782&dropoff[longitude]=-99.1558" target="_blank">${L.uberTo}</a>
+  <a class="uber-btn" href="https://m.uber.com/ul/?action=setPickup&dropoff%5Bformatted_address%5D=Xochicalco%2026%2C%20Narvarte%20Poniente%2C%20Benito%20Ju%C3%A1rez%2C%2003020%20CDMX&dropoff%5Blatitude%5D=19.3915&dropoff%5Blongitude%5D=-99.1562" target="_blank">${L.uberTo}</a>
 
   <!-- How to get here -->
   <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🗺️</div><div class="card-t">${L.howToGet}</div></div><div class="chev">▼</div></div>
@@ -506,15 +490,6 @@ catch(e){updDoor("error");setTimeout(()=>updDoor("idle"),3000)}}
 function tog(h){h.nextElementSibling.classList.toggle("open");h.querySelector(".chev").classList.toggle("open")}
 function cp(t){navigator.clipboard.writeText(t).then(()=>{$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),1500)})}
 
-// Theme toggle
-function toggleTheme(){
-  document.body.classList.toggle("light");
-  const isLight=document.body.classList.contains("light");
-  $("themeTog").textContent=isLight?"☀️":"🌙";
-  try{localStorage.setItem("dh_theme",isLight?"light":"dark")}catch(e){}
-}
-(function(){try{if(localStorage.getItem("dh_theme")==="light"){document.body.classList.add("light");$("themeTog").textContent="☀️"}}catch(e){}})();
-
 // Countdown
 function updateCountdown(){
   const el=$("countdown");if(!el)return;
@@ -526,19 +501,13 @@ function updateCountdown(){
   else{el.innerHTML="📅 <strong>"+diff+"</strong> "+L.stayLeft}
 }
 
-// WiFi QR Code (minimal generator)
+// WiFi QR Code
 function drawWifiQr(){
   const canvas=$("wifiQr");if(!canvas)return;
   const ctx=canvas.getContext("2d");
-  // Draw a simple styled QR placeholder that links to wifi
   const s=canvas.width;ctx.fillStyle="#fff";ctx.fillRect(0,0,s,s);
-  ctx.fillStyle="#0a0a0a";ctx.font="bold 11px system-ui";ctx.textAlign="center";
-  ctx.fillText("WIFI:T:WPA;S:Totalplay",s/2,s/2-20);
-  ctx.fillText("-D4B5-5G-EXT;",s/2,s/2-5);
-  ctx.fillText("P:D4B55712gde5SmAq;;",s/2,s/2+10);
-  ctx.font="9px system-ui";ctx.fillStyle="#999";
-  ctx.fillText(L.scanWifi,s/2,s/2+30);
-  // Load QR lib dynamically
+  ctx.fillStyle="#0a0a0a";ctx.font="bold 10px system-ui";ctx.textAlign="center";
+  ctx.fillText("Loading QR...",s/2,s/2);
   const script=document.createElement("script");
   script.src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js";
   script.onload=function(){
@@ -547,21 +516,4 @@ function drawWifiQr(){
   document.head.appendChild(script);
 }
 
-async function init(){
-$("app").classList.add("ready");
-// Try saved PIN first
-const saved=getPin();
-if(saved){
-  currentPin=saved;
-  try{
-    const r=await fetch(WORKER_URL+"/api/verify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pin:saved})});
-    const d=await r.json();
-    if(d.valid){renderActive(d,saved);return}
-  }catch(e){}
-}
-renderPinEntry();
-}
-setTimeout(init,1300);
-</script>
-</body>
-</html>
+// Theme toggle
