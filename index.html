@@ -2,10 +2,14 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<script>document.documentElement.lang=navigator.language&&navigator.language.startsWith("en")?"en":"es"</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Defihaus — Narvarte</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230a0a0a' width='100' height='100' rx='20'/><text x='50' y='62' text-anchor='middle' fill='%23e5e5e5' font-family='system-ui' font-size='40' font-weight='700'>D</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -114,10 +118,10 @@ body{background:#0a0a0a;color:#e5e5e5;font-family:'DM Sans',-apple-system,system
 </head>
 <body>
 <div id="app">
-  <div class="brand">Defihaus · Narvarte</div>
+  <div class="brand" id="brandText">Defihaus · Narvarte</div>
   <div id="content"></div>
 </div>
-<div class="toast" id="toast">Copiado</div>
+<div class="toast" id="toast">${L.copied}</div>
 
 <script>
 const WORKER_URL="https://puerta-narvarte.danielangelfidel.workers.dev";
@@ -125,16 +129,114 @@ const ACCESS_KEY="dh-narv-2026-secreto";
 const $=id=>document.getElementById(id);
 let doorState="idle",currentPin="";
 
-function renderLoading(){$("content").innerHTML='<div class="spinner-sm"></div><div style="font-size:13px;color:#525252">Cargando...</div>';$("app").classList.add("ready")}
+// Language detection
+const userLang=navigator.language||navigator.userLanguage||"es";
+const isEn=userLang.startsWith("en");
+const L={
+  brand:isEn?"Defihaus · Narvarte":"Defihaus · Narvarte",
+  loading:isEn?"Loading...":"Cargando...",
+  pinTitle:isEn?"Enter your PIN":"Ingresa tu PIN",
+  pinSub:isEn?"The 6-digit PIN you received via Airbnb":"El PIN de 6 dígitos que recibiste por Airbnb",
+  verify:isEn?"Verify":"Verificar",
+  verifying:isEn?"Verifying...":"Verificando...",
+  wrongPin:isEn?"Incorrect PIN":"PIN incorrecto",
+  noRes:isEn?"No active reservation right now":"No hay reserva activa en este momento",
+  errGeneric:isEn?"Error, try again":"Error, intenta de nuevo",
+  errConn:isEn?"Connection error":"Error de conexión",
+  welcome:isEn?"Welcome to Narvarte":"${L.welcome}",
+  tapOpen:isEn?"Tap to open":"${L.tapOpen}",
+  opening:isEn?"Opening...":"Abriendo...",
+  doorOpen:isEn?"Door opened":"Puerta abierta",
+  errRetry:isEn?"Error — try again":"Error — intenta de nuevo",
+  waitMoment:isEn?"Wait a moment":"Espera un momento",
+  accessUntil:isEn?"Access until":"Acceso hasta",
+  guideTitle:isEn?"Narvarte Guide":"Guía de Narvarte",
+  guideSub:isEn?"Best spots in the neighborhood, picked by locals":"${L.guideSub}",
+  wifi:"WiFi",
+  passAll:isEn?"Password (all networks)":"${L.passAll}",
+  tacos:"Tacos",
+  mustTry:isEn?"MUST TRY":"IMPERDIBLES",
+  restaurants:isEn?"Restaurants":"Restaurantes",
+  cafes:isEn?"Coffee Shops":"Cafeterías",
+  burgersSnacks:isEn?"Burgers & Snacks":"Burgers & Snacks",
+  bars:isEn?"Bars":"Bares",
+  transport:isEn?"Transport":"Transporte",
+  metroNearby:isEn?"Nearby metro stations:":"${L.metroNearby}",
+  otherTransport:isEn?"Other:":"${L.otherTransport}",
+  metrobus:isEn?"Line 1 on Insurgentes (Poliforum or Parque Hundido stop). Connects north-south.":"${L.metrobus}",
+  uber:isEn?"Work perfectly in the area. Average wait 3-5 min.":"${L.uber}",
+  metroCost:isEn?"Metro costs $5 MXN (~$0.25 USD). Metrobús $6 MXN. Both with rechargeable card from any station.":"${L.metroCost}",
+  airport:isEn?"To airport (AICM): Uber ~$150-250 MXN / 30-45 min. Metro Line 3 → transfer L9 Terminal Aérea.":"${L.airport}",
+  shopping:isEn?"Supermarkets & Shops":"Supermercados y tiendas",
+  culture:isEn?"Culture & Places":"Cultura y lugares",
+  tips:isEn?"Tips for your stay":"Tips para tu estancia",
+  tipSafety:isEn?"<strong>Safety:</strong> Narvarte is a quiet, safe neighborhood. As in any big city, watch your belongings and avoid walking alone late at night on dark streets.":"${L.tipSafety}",
+  tipTips:isEn?"<strong>Tipping:</strong> 10-15% at restaurants. At street taco stands it's not mandatory but leaving change is appreciated.":"${L.tipTips}",
+  tipWater:isEn?"<strong>Water:</strong> Don't drink tap water. Buy bottles at OXXO. Restaurant water is safe.":"${L.tipWater}",
+  tipCash:isEn?"<strong>Cash:</strong> Carry some cash. Many taco stands and markets don't accept cards. BBVA and Banorte ATMs are the most common.":"${L.tipCash}",
+  tipQuake:isEn?"<strong>Earthquake:</strong> If you feel a tremor, stay calm. Exit the building if you can or stand next to a load-bearing wall. The seismic alarm sounds before the quake.":"${L.tipQuake}",
+  tipRoma:isEn?"<strong>Roma & Condesa:</strong> Just 10 min by Uber. More restaurants, bars, galleries and nightlife. Walk along Av. Ámsterdam.":"${L.tipRoma}",
+  tipCentro:isEn?"<strong>Historic Center:</strong> 20 min by metro (L3 towards Indios Verdes, exit at Hidalgo or Bellas Artes). Zócalo, National Palace, Templo Mayor.":"${L.tipCentro}",
+  tipCoyoacan:isEn?"<strong>Coyoacán:</strong> 15 min by metro (L3 towards Universidad, exit at Coyoacán). Frida Kahlo House, artisan market, ice cream in the garden.":"${L.tipCoyoacan}",
+  emergency:isEn?"Emergencies":"Emergencias",
+  emer911:isEn?"Emergencies: 911":"${L.emer911}",
+  emer911sub:isEn?"Police, ambulance, firefighters":"${L.emer911sub}",
+  emerHosp:isEn?"Hospital Ángeles del Pedregal":"Hospital Ángeles del Pedregal",
+  emerHospSub:isEn?"Nearby private hospital":"${L.emerHospSub}",
+  emerPharm:isEn?"Farmacias del Ahorro / Similares":"Farmacias del Ahorro / Similares",
+  emerPharmSub:isEn?"Several in the area, some 24h":"${L.emerPharmSub}",
+  rules:isEn?"House Rules":"Reglas de la casa",
+  r1:isEn?"No visitors or additional guests beyond those registered are allowed.":"${L.r1}",
+  r2:isEn?"No parties or gatherings allowed.":"${L.r2}",
+  r3:isEn?"Smoking or vaping inside the accommodation is prohibited.":"${L.r3}",
+  r4:isEn?"Respect quiet hours.":"${L.r4}",
+  r5:isEn?"After using the kitchen, wash and leave everything clean.":"${L.r5}",
+  r6:isEn?"Keep common areas clean and tidy. Don't leave personal items in common areas.":"${L.r6}",
+  r7:isEn?"Trash must be disposed of daily in the container on the ground floor, just below the apartment.":"${L.r7}",
+  r8:isEn?"Make sure to lock doors and windows when leaving.":"${L.r8}",
+  r9:isEn?"Take care of our home as if it were yours.":"${L.r9}",
+  bye:isEn?"We appreciate your respect and cooperation<br>Enjoy Narvarte!":"${L.bye}",
+  copied:isEn?"Copied":"Copiado",
+  noAccess:isEn?"Access not available":"Acceso no disponible",
+  noResSub:isEn?"No active reservation at this time":"No hay reserva activa en este momento",
+  walk:isEn?"walk":"caminando",
+  // Place descriptions
+  vilsitoDesc:isEn?"By day it's a car repair shop, by night it's Narvarte's most legendary taco stand. Featured on Netflix's Taco Chronicles. The pastor is spectacular.":"${L.vilsitoDesc}",
+  tonyDesc:isEn?"Over 15 years serving the best suadero in the area. Open almost 24 hours. The campechanos are a must.":"${L.tonyDesc}",
+  birriaDesc:isEn?"Soft taco, crispy taco, birriamen, birriasquites, pizzabirria. Fridays: all-you-can-eat birria for $155.":"${L.birriaDesc}",
+  rinconDesc:isEn?"The perfect brunch spot. Morning: coffee and sourdough bread. Afternoon: transforms into a wine bar.":"${L.rinconDesc}",
+  rudoDesc:isEn?"Japanese, Korean and Middle Eastern fusion adapted to Mexican tastes. The shortrib springrolls are the star. Huge portions, bring friends.":"${L.rudoDesc}",
+  socarratDesc:isEn?"Authentic Spanish paella, tapas, croquetas. Sidewalk tables, casual vibe. Paella on Thu, Sat, Sun.":"${L.socarratDesc}",
+  mareaDesc:isEn?"Ceviche and aguachiles with authentic Pacific coast flavors. Everything made to order with daily ingredients.":"${L.mareaDesc}",
+  secinaDesc:isEn?"Honest Mexican heritage cuisine. Works with 100% local producers. The tlayudas and cecina are next level.":"${L.secinaDesc}",
+  szechuanDesc:isEn?"Authentic Sichuan flavors. Seriously spicy, aromatic and addictive. One of the best Chinese restaurants in CDMX.":"${L.szechuanDesc}",
+  holaDesc:isEn?"Colorful gourmet tortilla shop. Tortillas of all colors and flavors. A visual and gastronomic experience.":"${L.holaDesc}",
+  alquimiaDesc:isEn?"Award-winning baristas at national level. Mexican beans, various brewing methods. Their cold brew is one of the city's best.":"${L.alquimiaDesc}",
+  antenatiDesc:isEn?"Specialty coffee + Saturday workshops: ceramics, jewelry, watercolor, embroidery. Check their IG for the calendar.":"${L.antenatiDesc}",
+  secretDesc:isEn?"Hidden behind a normal house. Brioche bun burgers dripping with cheese, boneless, ribs. The corn cake dessert is a must.":"${L.secretDesc}",
+  lupuloDesc:isEn?"Artisan pizza and beer in a chill atmosphere. Perfect for hours of conversation.":"${L.lupuloDesc}",
+  manadaDesc:isEn?"Minimalist bar with natural wines, vermouths and cocktails made exclusively with Mexican spirits. Weekday food pop-ups.":"${L.manadaDesc}",
+  deltaDesc:isEn?"Large mall with supermarket, cinema, clothing stores and food court. 10 min walk.":"${L.deltaDesc}",
+  plazaUniDesc:isEn?"Mall with Sears, Liverpool, cinema and restaurants. 15 min by Uber.":"${L.plazaUniDesc}",
+  oxxoDesc:isEn?"24h convenience stores on every corner. Snacks, drinks and cash withdrawal.":"${L.oxxoDesc}",
+  mercadoDesc:isEn?"Traditional Mexican market. Fresh fruit, homemade food, natural juices. Authentic experience at local prices.":"${L.mercadoDesc}",
+  cinetecaDesc:isEn?"Mexico's temple of cinema. Art films, festivals, documentaries. 15 min by Uber.":"${L.cinetecaDesc}",
+  parqueDesc:isEn?"The locals' favorite park. Dog zone, green area, great for running or reading.":"${L.parqueDesc}",
+  temploDesc:isEn?"Iconic church designed by Félix Candela. Its hyperbolic structure is a masterpiece of modern architecture.":"${L.temploDesc}",
+  wtcDesc:isEn?"Convention center and events venue. Concerts, expos and the revolving restaurant Bellini on the 45th floor.":"${L.wtcDesc}",
+  glorietaDesc:isEn?"The heart of Narvarte. The fountain surrounded by palm trees where the main avenues converge. Perfect for strolling.":"${L.glorietaDesc}",
+};
+
+function renderLoading(){$("content").innerHTML='<div class="spinner-sm"></div><div style="font-size:13px;color:#525252">${L.loading}</div>';$("app").classList.add("ready")}
 
 function renderPinEntry(){
 $("content").innerHTML=`
 <div class="pin-container">
   <div class="pin-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 5-5v0a5 5 0 0 1 5 5v4"/></svg></div>
-  <div class="pin-title">Ingresa tu PIN</div>
-  <div class="pin-sub">El PIN de 6 dígitos que recibiste por Airbnb</div>
+  <div class="pin-title">${L.pinTitle}</div>
+  <div class="pin-sub">${L.pinSub}</div>
   <div class="pin-inputs"><input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="0" autofocus><input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="1"><input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="2"><input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="3"><input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="4"><input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="5"></div>
-  <button class="pin-btn" id="pinBtn" onclick="verifyPin()" disabled>Verificar</button>
+  <button class="pin-btn" id="pinBtn" onclick="verifyPin()" disabled>${L.verify}</button>
   <div class="pin-error" id="pinError"></div>
 </div>`;
 const d=document.querySelectorAll(".pin-digit");
@@ -142,22 +244,22 @@ d.forEach((el,i)=>{el.addEventListener("input",()=>{el.value=el.value.replace(/[
 }
 function updBtn(){const d=document.querySelectorAll(".pin-digit");currentPin=Array.from(d).map(x=>x.value).join("");$("pinBtn").disabled=currentPin.length!==6}
 
-async function verifyPin(){$("pinBtn").disabled=true;$("pinBtn").textContent="Verificando...";$("pinError").textContent="";
+async function verifyPin(){$("pinBtn").disabled=true;$("pinBtn").textContent=L.verifying;$("pinError").textContent="";
 try{const r=await fetch(WORKER_URL+"/api/verify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pin:currentPin})});const d=await r.json();
 if(d.valid){renderActive(d,currentPin)}
-else if(d.error==="wrong_pin"){$("pinError").textContent="PIN incorrecto";document.querySelectorAll(".pin-digit").forEach(x=>{x.classList.add("err");x.value=""});document.querySelector(".pin-digit").focus();$("pinBtn").textContent="Verificar"}
-else if(d.error==="no_reservation"){$("pinError").textContent="No hay reserva activa en este momento";$("pinBtn").textContent="Verificar"}
-else{$("pinError").textContent="Error, intenta de nuevo";$("pinBtn").textContent="Verificar"}
-}catch(e){$("pinError").textContent="Error de conexión";$("pinBtn").textContent="Verificar"}}
+else if(d.error==="wrong_pin"){$("pinError").textContent=L.wrongPin;document.querySelectorAll(".pin-digit").forEach(x=>{x.classList.add("err");x.value=""});document.querySelector(".pin-digit").focus();$("pinBtn").textContent=L.verify}
+else if(d.error==="no_reservation"){$("pinError").textContent=L.noRes;$("pinBtn").textContent=L.verify}
+else{$("pinError").textContent=L.errGeneric;$("pinBtn").textContent=L.verify}
+}catch(e){$("pinError").textContent=L.errConn;$("pinBtn").textContent=L.verify}}
 
 function renderActive(data,pin){
 const co=data.checkOut?new Date(data.checkOut).toLocaleDateString("es-MX",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";
 $("content").innerHTML=`
 <div class="door-section">
-  <div style="font-size:14px;color:#525252;margin-bottom:24px">Bienvenido a Narvarte</div>
+  <div style="font-size:14px;color:#525252;margin-bottom:24px">${L.welcome}</div>
   <div class="circle idle" id="door" onclick="openDoor()"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#d4d4d4" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-  <div class="label" id="doorLabel" style="color:#e5e5e5">Toca para abrir</div>
-  ${co?'<div class="sublabel">Acceso hasta '+co+'</div>':""}
+  <div class="label" id="doorLabel" style="color:#e5e5e5">${L.tapOpen}</div>
+  ${co?'<div class="sublabel">${L.accessUntil} '+co+'</div>':""}
 </div>
 <div class="guide">
   <div class="guide-divider"></div>
@@ -168,125 +270,125 @@ $("content").innerHTML=`
     <div class="wifi-item"><span class="wifi-name">Red general (5G)</span><span class="wifi-val" onclick="cp('Totalplay-D4B5-5G-EXT')">Totalplay-D4B5-5G-EXT</span></div>
     <div class="wifi-item"><span class="wifi-name">Recámara 1</span><span class="wifi-val" onclick="cp('Totalplay-D4B5_EXT_2')">Totalplay-D4B5_EXT_2</span></div>
     <div class="wifi-item"><span class="wifi-name">Recámara 2</span><span class="wifi-val" onclick="cp('Totalplay-D4B5')">Totalplay-D4B5</span></div>
-    <div class="wifi-pass"><span class="wifi-pass-l">Contraseña (todas)</span><span class="wifi-pass-v" onclick="cp('D4B55712gde5SmAq')">D4B55712gde5SmAq</span></div>
+    <div class="wifi-pass"><span class="wifi-pass-l">${L.passAll}</span><span class="wifi-pass-v" onclick="cp('D4B55712gde5SmAq')">D4B55712gde5SmAq</span></div>
   </div></div>
 
   <!-- RESTAURANTES -->
-  <div class="guide-hero"><h2>Guía de Narvarte</h2><p>Los mejores spots del barrio, seleccionados por locales</p></div>
+  <div class="guide-hero"><h2>${L.guideTitle}</h2><p>${L.guideSub}</p></div>
 
-  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🌮</div><div class="card-t">Tacos</div><div class="card-badge">IMPERDIBLES</div></div><div class="chev">▼</div></div>
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🌮</div><div class="card-t">${L.tacos}</div><div class="card-badge">${L.mustTry}</div></div><div class="chev">▼</div></div>
   <div class="card-b">
-    <div class="place"><div class="place-name">El Vilsito</div><div class="place-cat">Tacos al pastor</div><div class="place-desc">De día es taller mecánico, de noche es la taquería más legendaria de la Narvarte. Apareció en Las Crónicas del Taco de Netflix. El pastor es espectacular.</div><div class="place-meta"><span><a href="https://maps.google.com/?q=El+Vilsito+tacos+Av+Universidad+Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Av. Universidad esq. Petén</a></span><span>🕐 Noches</span><span>💰 $</span></div></div>
-    <div class="place"><div class="place-name">Tacos Tony</div><div class="place-cat">Suadero · Campechanos</div><div class="place-desc">Más de 15 años sirviendo el mejor suadero de la zona. Abierto prácticamente 24 horas. Los campechanos son obligatorios.</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Tacos+Tony+Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Frente a El Vilsito</a></span><span>🕐 24h casi</span><span>💰 $</span></div></div>
-    <div class="place"><div class="place-name">Cuatro de Birria</div><div class="place-cat">Birria en todas sus formas</div><div class="place-desc">Taco blando, dorado, birriamen, birriasquites, pizzabirria. Los viernes: toda la birria que puedas comer por $155.</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Caleta+554+Narvarte+Oriente+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Caleta 554</a></span><span>🕐 9:00-21:30</span><span>💰 $$</span></div></div>
+    <div class="place"><div class="place-name">El Vilsito</div><div class="place-cat">Tacos al pastor</div><div class="place-desc">${L.vilsitoDesc}</div><div class="place-meta"><span><a href="https://maps.google.com/?q=El+Vilsito+tacos+Av+Universidad+Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Av. Universidad esq. Petén</a></span><span>🕐 Noches</span><span>💰 $</span></div></div>
+    <div class="place"><div class="place-name">Tacos Tony</div><div class="place-cat">Suadero · Campechanos</div><div class="place-desc">${L.tonyDesc}</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Tacos+Tony+Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Frente a El Vilsito</a></span><span>🕐 24h casi</span><span>💰 $</span></div></div>
+    <div class="place"><div class="place-name">Cuatro de Birria</div><div class="place-cat">Birria en todas sus formas</div><div class="place-desc">${L.birriaDesc}</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Caleta+554+Narvarte+Oriente+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Caleta 554</a></span><span>🕐 9:00-21:30</span><span>💰 $$</span></div></div>
   </div></div>
 
-  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🍽️</div><div class="card-t">Restaurantes</div></div><div class="chev">▼</div></div>
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🍽️</div><div class="card-t">${L.restaurants}</div></div><div class="chev">▼</div></div>
   <div class="card-b">
-    <div class="place"><div class="place-name">Rincón</div><div class="place-cat">Brunch · Mexicano contemporáneo</div><div class="place-desc">El spot perfecto para desayuno o brunch. Por la mañana café y pan de masa madre, por la tarde se transforma en wine bar.</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Heriberto+Frias+205+Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Heriberto Frías 205</a></span><span>💰 $$</span></div></div>
-    <div class="place"><div class="place-name">Rudo</div><div class="place-cat">Fusión asiática</div><div class="place-desc">Cocina de Japón, Corea y Medio Oriente adaptada al paladar mexicano. Los springrolls de shortrib son el estelar. Platos enormes, ve acompañado.</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Narvarte+Poniente+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Narvarte Poniente</a></span><span>💰 $$</span></div></div>
-    <div class="place"><div class="place-name">Socarrat Arrocería</div><div class="place-cat">Cocina española · Paella</div><div class="place-desc">Paella auténtica española, tapas, croquetas. Mesas en la banqueta, ambiente informal. Paella los jueves, sábados y domingos.</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Narvarte+Poniente+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Narvarte Poniente</a></span><span>💰 $$</span></div></div>
-    <div class="place"><div class="place-name">Marea Alta</div><div class="place-cat">Cevichería · Mariscos</div><div class="place-desc">Ceviche y aguachiles con sabores auténticos de la costa del Pacífico. Todo hecho al momento con ingredientes del día.</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Narvarte</a></span><span>💰 $$</span></div></div>
-    <div class="place"><div class="place-name">La Secina</div><div class="place-cat">Antojería mexicana</div><div class="place-desc">Cocina honesta de herencia mexicana. Trabajan con productores 100% locales. Las tlayudas y la cecina son de otro nivel.</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Narvarte</a></span><span>💰 $$</span></div></div>
-    <div class="place"><div class="place-name">Szechuan Gourmet</div><div class="place-cat">Comida china auténtica</div><div class="place-desc">Sabores auténticos de Sichuan. Picante de verdad, aromático y adictivo. De los mejores chinos de CDMX.</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Narvarte</a></span><span>💰 $$-$$$</span></div></div>
-    <div class="place"><div class="place-name">Hola Bonita</div><div class="place-cat">Tortillería gourmet</div><div class="place-desc">Tortillería repleta de colores vibrantes. Tortillas de todos colores y sabores. Experiencia visual y gastronómica.</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Hola+Bonita+Tortilleria+Av+Universidad+217+Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Av. Universidad 217</a></span><span>🕐 8:30-17:00</span><span>💰 $</span></div></div>
+    <div class="place"><div class="place-name">Rincón</div><div class="place-cat">Brunch · Mexicano contemporáneo</div><div class="place-desc">${L.rinconDesc}</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Heriberto+Frias+205+Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Heriberto Frías 205</a></span><span>💰 $$</span></div></div>
+    <div class="place"><div class="place-name">Rudo</div><div class="place-cat">Fusión asiática</div><div class="place-desc">${L.rudoDesc}</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Narvarte+Poniente+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Narvarte Poniente</a></span><span>💰 $$</span></div></div>
+    <div class="place"><div class="place-name">Socarrat Arrocería</div><div class="place-cat">Cocina española · Paella</div><div class="place-desc">${L.socarratDesc}</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Narvarte+Poniente+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Narvarte Poniente</a></span><span>💰 $$</span></div></div>
+    <div class="place"><div class="place-name">Marea Alta</div><div class="place-cat">Cevichería · Mariscos</div><div class="place-desc">${L.mareaDesc}</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Narvarte</a></span><span>💰 $$</span></div></div>
+    <div class="place"><div class="place-name">La Secina</div><div class="place-cat">Antojería mexicana</div><div class="place-desc">${L.secinaDesc}</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Narvarte</a></span><span>💰 $$</span></div></div>
+    <div class="place"><div class="place-name">Szechuan Gourmet</div><div class="place-cat">Comida china auténtica</div><div class="place-desc">${L.szechuanDesc}</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Narvarte</a></span><span>💰 $$-$$$</span></div></div>
+    <div class="place"><div class="place-name">Hola Bonita</div><div class="place-cat">Tortillería gourmet</div><div class="place-desc">${L.holaDesc}</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Hola+Bonita+Tortilleria+Av+Universidad+217+Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Av. Universidad 217</a></span><span>🕐 8:30-17:00</span><span>💰 $</span></div></div>
   </div></div>
 
-  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">☕</div><div class="card-t">Cafeterías</div></div><div class="chev">▼</div></div>
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">☕</div><div class="card-t">${L.cafes}</div></div><div class="chev">▼</div></div>
   <div class="card-b">
-    <div class="place"><div class="place-name">Alquimia Café</div><div class="place-cat">Café de especialidad</div><div class="place-desc">Baristas premiados a nivel nacional. Granos mexicanos, varios métodos de extracción. Su cold brew es de los mejores de la ciudad.</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Narvarte</a></span><span>💰 $$</span></div></div>
-    <div class="place"><div class="place-name">Antenati Café</div><div class="place-cat">Café · Talleres creativos</div><div class="place-desc">Café de especialidad + talleres de cerámica, joyería, acuarela y bordado los sábados. Consulta su IG para el calendario.</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Xochicalco+273+Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Xochicalco 273</a></span><span>🕐 L-V 10:00-19:00</span><span>💰 $</span></div></div>
+    <div class="place"><div class="place-name">Alquimia Café</div><div class="place-cat">Café de especialidad</div><div class="place-desc">${L.alquimiaDesc}</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Narvarte</a></span><span>💰 $$</span></div></div>
+    <div class="place"><div class="place-name">Antenati Café</div><div class="place-cat">Café · Talleres creativos</div><div class="place-desc">${L.antenatiDesc}</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Xochicalco+273+Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Xochicalco 273</a></span><span>🕐 L-V 10:00-19:00</span><span>💰 $</span></div></div>
   </div></div>
 
-  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🍔</div><div class="card-t">Burgers & Snacks</div></div><div class="chev">▼</div></div>
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🍔</div><div class="card-t">${L.burgersSnacks}</div></div><div class="chev">▼</div></div>
   <div class="card-b">
-    <div class="place"><div class="place-name">Secret Burgers</div><div class="place-cat">Speakeasy de hamburguesas</div><div class="place-desc">Escondido detrás de una casa normal. Hamburguesas de pan brioche bañadas en queso, boneless, costillas. El panque de elote de postre es obligatorio.</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Anaxagoras+607+Narvarte+Poniente+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Anaxágoras 607</a></span><span>🕐 Mié-Sáb 13-21h</span><span>💰 $$</span></div></div>
-    <div class="place"><div class="place-name">Lúpulo Pizza</div><div class="place-cat">Pizza artesanal · Cerveza</div><div class="place-desc">Pizza y chela en un ambiente relajado. Perfecto para pasar horas platicando sin presiones.</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Narvarte</a></span><span>💰 $$</span></div></div>
+    <div class="place"><div class="place-name">Secret Burgers</div><div class="place-cat">Speakeasy de hamburguesas</div><div class="place-desc">${L.secretDesc}</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Anaxagoras+607+Narvarte+Poniente+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Anaxágoras 607</a></span><span>🕐 Mié-Sáb 13-21h</span><span>💰 $$</span></div></div>
+    <div class="place"><div class="place-name">Lúpulo Pizza</div><div class="place-cat">Pizza artesanal · Cerveza</div><div class="place-desc">${L.lupuloDesc}</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Narvarte</a></span><span>💰 $$</span></div></div>
   </div></div>
 
-  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🍷</div><div class="card-t">Bares</div></div><div class="chev">▼</div></div>
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🍷</div><div class="card-t">${L.bars}</div></div><div class="chev">▼</div></div>
   <div class="card-b">
-    <div class="place"><div class="place-name">Manada</div><div class="place-cat">Vinos naturales · Coctelería</div><div class="place-desc">Bar minimalista con vinos naturales, vermouths y coctelería hecha exclusivamente con destilados mexicanos. Pop-ups gastronómicos entre semana.</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Narvarte</a></span><span>💰 $$</span></div></div>
+    <div class="place"><div class="place-name">Manada</div><div class="place-cat">Vinos naturales · Coctelería</div><div class="place-desc">${L.manadaDesc}</div><div class="place-meta"><span><a href="https://maps.google.com/?q=Narvarte+CDMX" target="_blank" style="color:#525252;text-decoration:none;border-bottom:1px dashed #3a3a3a">📍 Narvarte</a></span><span>💰 $$</span></div></div>
   </div></div>
 
   <div class="guide-divider"></div>
 
   <!-- TRANSPORTE -->
-  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🚇</div><div class="card-t">Transporte</div></div><div class="chev">▼</div></div>
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🚇</div><div class="card-t">${L.transport}</div></div><div class="chev">▼</div></div>
   <div class="card-b">
-    <div style="font-size:12px;color:#737373;margin-bottom:10px">Estaciones de metro cercanas:</div>
-    <div class="metro-station"><a href="https://maps.google.com/?q=Metro+Etiopia+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a"><strong>Etiopía</strong></a> <span class="metro-line ml-3">L3</span> — 5 min caminando</div>
-    <div class="metro-station"><a href="https://maps.google.com/?q=Metro+Eugenia+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a"><strong>Eugenia</strong></a> <span class="metro-line ml-3">L3</span> — 10 min caminando</div>
-    <div class="metro-station"><a href="https://maps.google.com/?q=Metro+Division+del+Norte+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a"><strong>División del Norte</strong></a> <span class="metro-line ml-3">L3</span> — 12 min caminando</div>
-    <div class="metro-station"><a href="https://maps.google.com/?q=Metro+Centro+Medico+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a"><strong>Centro Médico</strong></a> <span class="metro-line ml-3">L3</span> <span class="metro-line ml-9">L9</span> — 15 min caminando</div>
-    <div style="font-size:12px;color:#737373;margin:12px 0 8px">Otros:</div>
-    <div class="tip"><strong>Metrobús:</strong> Línea 1 sobre Insurgentes (estación Poliforum o Parque Hundido). Conecta norte-sur de la ciudad.</div>
-    <div class="tip"><strong>Uber/DiDi/Beat:</strong> Funcionan perfecto en la zona. Tiempo promedio de espera 3-5 min.</div>
+    <div style="font-size:12px;color:#737373;margin-bottom:10px">${L.metroNearby}</div>
+    <div class="metro-station"><a href="https://maps.google.com/?q=Metro+Etiopia+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a"><strong>Etiopía</strong></a> <span class="metro-line ml-3">L3</span> — 5 min ${L.walk}</div>
+    <div class="metro-station"><a href="https://maps.google.com/?q=Metro+Eugenia+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a"><strong>Eugenia</strong></a> <span class="metro-line ml-3">L3</span> — 10 min ${L.walk}</div>
+    <div class="metro-station"><a href="https://maps.google.com/?q=Metro+Division+del+Norte+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a"><strong>División del Norte</strong></a> <span class="metro-line ml-3">L3</span> — 12 min ${L.walk}</div>
+    <div class="metro-station"><a href="https://maps.google.com/?q=Metro+Centro+Medico+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a"><strong>Centro Médico</strong></a> <span class="metro-line ml-3">L3</span> <span class="metro-line ml-9">L9</span> — 15 min ${L.walk}</div>
+    <div style="font-size:12px;color:#737373;margin:12px 0 8px">${L.otherTransport}</div>
+    <div class="tip"><strong>Metrobús:</strong> ${L.metrobus}</div>
+    <div class="tip"><strong>Uber/DiDi/Beat:</strong> ${L.uber}</div>
     <div class="tip"><strong>Metro cuesta $5 MXN</strong> (~$0.25 USD). Metrobús $6 MXN. Ambos con tarjeta recargable que compras en cualquier estación.</div>
     <div class="tip"><strong>Al aeropuerto (AICM):</strong> Uber ~$150-250 MXN / 30-45 min. Metro Línea 3 → transbordo L9 Terminal Aérea.</div>
   </div></div>
 
   <!-- COMPRAS -->
-  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🛒</div><div class="card-t">Supermercados y tiendas</div></div><div class="chev">▼</div></div>
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🛒</div><div class="card-t">${L.shopping}</div></div><div class="chev">▼</div></div>
   <div class="card-b">
-    <div class="place"><div class="place-name"><a href="https://maps.google.com/?q=Parque+Delta+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a">Parque Delta</a></div><div class="place-desc">Centro comercial grande con supermercado, cine, tiendas de ropa y food court. A 10 min caminando.</div></div>
-    <div class="place"><div class="place-name"><a href="https://maps.google.com/?q=Plaza+Universidad+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a">Plaza Universidad</a></div><div class="place-desc">Centro comercial con Sears, Liverpool, cine y restaurantes. 15 min en Uber.</div></div>
-    <div class="place"><div class="place-name">OXXO / 7-Eleven</div><div class="place-desc">Tiendas de conveniencia 24h en cada esquina. Para snacks, bebidas y retiro de efectivo.</div></div>
-    <div class="place"><div class="place-name"><a href="https://maps.google.com/?q=Mercado+Narvarte+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a">Mercado Narvarte</a></div><div class="place-desc">Mercado tradicional mexicano. Fruta fresca, comida casera, jugos naturales. Experiencia auténtica y precios locales.</div></div>
+    <div class="place"><div class="place-name"><a href="https://maps.google.com/?q=Parque+Delta+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a">Parque Delta</a></div><div class="place-desc">${L.deltaDesc}</div></div>
+    <div class="place"><div class="place-name"><a href="https://maps.google.com/?q=Plaza+Universidad+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a">Plaza Universidad</a></div><div class="place-desc">${L.plazaUniDesc}</div></div>
+    <div class="place"><div class="place-name">OXXO / 7-Eleven</div><div class="place-desc">${L.oxxoDesc}</div></div>
+    <div class="place"><div class="place-name"><a href="https://maps.google.com/?q=Mercado+Narvarte+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a">Mercado Narvarte</a></div><div class="place-desc">${L.mercadoDesc}</div></div>
   </div></div>
 
   <!-- CULTURA -->
-  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🎭</div><div class="card-t">Cultura y lugares</div></div><div class="chev">▼</div></div>
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🎭</div><div class="card-t">${L.culture}</div></div><div class="chev">▼</div></div>
   <div class="card-b">
-    <div class="place"><div class="place-name"><a href="https://maps.google.com/?q=Cineteca+Nacional+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a">Cineteca Nacional</a></div><div class="place-desc">El templo del cine en México. Películas de arte, festivales, documentales. A 15 min en Uber.</div></div>
-    <div class="place"><div class="place-name"><a href="https://maps.google.com/?q=Parque+de+las+Americas+Narvarte+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a">Parque de las Américas</a></div><div class="place-desc">El parque favorito de los locales. Zona para perros, área verde y un buen lugar para correr o leer.</div></div>
-    <div class="place"><div class="place-name"><a href="https://maps.google.com/?q=Templo+Medalla+Milagrosa+Narvarte+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a">Templo de la Medalla Milagrosa</a></div><div class="place-desc">Iglesia icónica diseñada por Félix Candela. Su estructura hiperbólica es una obra maestra de la arquitectura moderna.</div></div>
-    <div class="place"><div class="place-name"><a href="https://maps.google.com/?q=World+Trade+Center+Mexico+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a">World Trade Center</a></div><div class="place-desc">Centro de convenciones y eventos. Conciertos, expos y el restaurante giratorio Bellini en el piso 45.</div></div>
-    <div class="place"><div class="place-name"><a href="https://maps.google.com/?q=Glorieta+SCOP+Narvarte+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a">Glorieta SCOP</a></div><div class="place-desc">El corazón de la Narvarte. La fuente rodeada de palmeras donde convergen las avenidas principales. Perfecta para pasear.</div></div>
+    <div class="place"><div class="place-name"><a href="https://maps.google.com/?q=Cineteca+Nacional+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a">Cineteca Nacional</a></div><div class="place-desc">${L.cinetecaDesc}</div></div>
+    <div class="place"><div class="place-name"><a href="https://maps.google.com/?q=Parque+de+las+Americas+Narvarte+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a">Parque de las Américas</a></div><div class="place-desc">${L.parqueDesc}</div></div>
+    <div class="place"><div class="place-name"><a href="https://maps.google.com/?q=Templo+Medalla+Milagrosa+Narvarte+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a">Templo de la Medalla Milagrosa</a></div><div class="place-desc">${L.temploDesc}</div></div>
+    <div class="place"><div class="place-name"><a href="https://maps.google.com/?q=World+Trade+Center+Mexico+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a">World Trade Center</a></div><div class="place-desc">${L.wtcDesc}</div></div>
+    <div class="place"><div class="place-name"><a href="https://maps.google.com/?q=Glorieta+SCOP+Narvarte+CDMX" target="_blank" style="color:#e5e5e5;text-decoration:none;border-bottom:1px dashed #3a3a3a">Glorieta SCOP</a></div><div class="place-desc">${L.glorietaDesc}</div></div>
   </div></div>
 
   <!-- TIPS -->
-  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">💡</div><div class="card-t">Tips para tu estancia</div></div><div class="chev">▼</div></div>
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">💡</div><div class="card-t">${L.tips}</div></div><div class="chev">▼</div></div>
   <div class="card-b">
-    <div class="tip"><strong>Seguridad:</strong> Narvarte es un barrio tranquilo y seguro. Como en toda gran ciudad, cuida tus pertenencias y evita caminar solo muy tarde por calles oscuras.</div>
-    <div class="tip"><strong>Propinas:</strong> 10-15% en restaurantes. En taquerías callejeras no es obligatorio pero se agradece dejar cambio.</div>
-    <div class="tip"><strong>Agua:</strong> No bebas agua del grifo. Compra garrafones o botellas en OXXO. En restaurantes el agua es segura.</div>
-    <div class="tip"><strong>Efectivo:</strong> Lleva algo de efectivo. Muchas taquerías y mercados no aceptan tarjeta. Los cajeros BBVA y Banorte son los más comunes.</div>
-    <div class="tip"><strong>Sismo:</strong> Si sientes un temblor, mantén la calma. Sal del edificio si puedes o ubícate junto a un muro de carga. La alarma sísmica suena antes del sismo.</div>
-    <div class="tip"><strong>Roma & Condesa:</strong> A solo 10 min en Uber. Más restaurantes, bares, galerías y vida nocturna. Paseo por Av. Ámsterdam.</div>
-    <div class="tip"><strong>Centro Histórico:</strong> 20 min en metro (L3 dirección Indios Verdes, bajar en Hidalgo o Bellas Artes). Zócalo, Palacio Nacional, Templo Mayor.</div>
-    <div class="tip"><strong>Coyoacán:</strong> 15 min en metro (L3 dirección Universidad, bajar en Coyoacán). Casa de Frida Kahlo, mercado de artesanías, helados en el jardín.</div>
+    <div class="tip">${L.tipSafety}</div>
+    <div class="tip">${L.tipTips}</div>
+    <div class="tip">${L.tipWater}</div>
+    <div class="tip">${L.tipCash}</div>
+    <div class="tip">${L.tipQuake}</div>
+    <div class="tip">${L.tipRoma}</div>
+    <div class="tip">${L.tipCentro}</div>
+    <div class="tip">${L.tipCoyoacan}</div>
   </div></div>
 
   <!-- EMERGENCIAS -->
-  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🆘</div><div class="card-t">Emergencias</div></div><div class="chev">▼</div></div>
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🆘</div><div class="card-t">${L.emergency}</div></div><div class="chev">▼</div></div>
   <div class="card-b">
-    <div class="emergency"><div class="emergency-ico">🚑</div><div class="emergency-info"><div>Emergencias: 911</div><div>Policía, ambulancia, bomberos</div></div></div>
-    <div class="emergency"><div class="emergency-ico">🏥</div><div class="emergency-info"><div>Hospital Ángeles del Pedregal</div><div>Hospital privado cercano</div></div></div>
-    <div class="emergency"><div class="emergency-ico">💊</div><div class="emergency-info"><div>Farmacias del Ahorro / Similares</div><div>Hay varias en la zona, algunas 24h</div></div></div>
+    <div class="emergency"><div class="emergency-ico">🚑</div><div class="emergency-info"><div>${L.emer911}</div><div>${L.emer911sub}</div></div></div>
+    <div class="emergency"><div class="emergency-ico">🏥</div><div class="emergency-info"><div>Hospital Ángeles del Pedregal</div><div>${L.emerHospSub}</div></div></div>
+    <div class="emergency"><div class="emergency-ico">💊</div><div class="emergency-info"><div>Farmacias del Ahorro / Similares</div><div>${L.emerPharmSub}</div></div></div>
   </div></div>
 
   <!-- REGLAS -->
   <div class="guide-divider"></div>
-  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">📋</div><div class="card-t">Reglas de la casa</div></div><div class="chev">▼</div></div>
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">📋</div><div class="card-t">${L.rules}</div></div><div class="chev">▼</div></div>
   <div class="card-b">
-    <div class="rule"><em>🚷</em><span>No está permitido el ingreso de visitas ni personas adicionales a las registradas.</span></div>
-    <div class="rule"><em>❌</em><span>No se permiten fiestas ni reuniones.</span></div>
-    <div class="rule"><em>🚫</em><span>Prohibido fumar o vapear dentro del alojamiento.</span></div>
-    <div class="rule"><em>🔇</em><span>Respeta los horarios de silencio.</span></div>
-    <div class="rule"><em>🍽️</em><span>Después de usar la cocina, lava y deja limpio todo lo que hayas utilizado.</span></div>
-    <div class="rule"><em>🧹</em><span>Mantén las áreas comunes limpias y ordenadas. No dejes objetos personales en áreas comunes.</span></div>
-    <div class="rule"><em>♻️</em><span>La basura debe tirarse diariamente en el contenedor de la planta baja, justo debajo del apartamento.</span></div>
-    <div class="rule"><em>🔐</em><span>Asegúrate de cerrar bien puertas y ventanas al salir.</span></div>
-    <div class="rule"><em>🏡</em><span>Cuida nuestra casa como si fuera tuya.</span></div>
+    <div class="rule"><em>🚷</em><span>${L.r1}</span></div>
+    <div class="rule"><em>❌</em><span>${L.r2}</span></div>
+    <div class="rule"><em>🚫</em><span>${L.r3}</span></div>
+    <div class="rule"><em>🔇</em><span>${L.r4}</span></div>
+    <div class="rule"><em>🍽️</em><span>${L.r5}</span></div>
+    <div class="rule"><em>🧹</em><span>${L.r6}</span></div>
+    <div class="rule"><em>♻️</em><span>${L.r7}</span></div>
+    <div class="rule"><em>🔐</em><span>${L.r8}</span></div>
+    <div class="rule"><em>🏡</em><span>${L.r9}</span></div>
   </div></div>
 
-  <div style="text-align:center;padding:24px 0 12px;font-size:12px;color:#2a2a2a;line-height:1.6">✨ Agradecemos tu respeto y colaboración<br>¡Disfruta Narvarte!</div>
+  <div style="text-align:center;padding:24px 0 12px;font-size:12px;color:#2a2a2a;line-height:1.6">✨ ${L.bye}</div>
 </div>`;currentPin=pin}
 
 function updDoor(s){doorState=s;const c=$("door"),l=$("doorLabel");if(!c||!l)return;c.className="circle "+s;
 const ic={idle:'<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#d4d4d4" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',opening:'<div class="spinner"></div>',success:'<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',error:'<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',rate:'<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'};
-const lb={idle:{t:"Toca para abrir",c:"#e5e5e5"},opening:{t:"Abriendo...",c:"#818cf8"},success:{t:"Puerta abierta",c:"#34d399"},error:{t:"Error — intenta de nuevo",c:"#f87171"},rate:{t:"Espera un momento",c:"#fb923c"}};
+const lb={idle:{t:"${L.tapOpen}",c:"#e5e5e5"},opening:{t:L.opening,c:"#818cf8"},success:{t:L.doorOpen,c:"#34d399"},error:{t:L.errRetry,c:"#f87171"},rate:{t:L.waitMoment,c:"#fb923c"}};
 c.innerHTML=ic[s]||ic.idle;l.textContent=lb[s]?lb[s].t:"";l.style.color=lb[s]?lb[s].c:"#e5e5e5"}
 
 async function openDoor(){if(doorState!=="idle")return;updDoor("opening");
