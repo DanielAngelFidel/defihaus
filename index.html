@@ -5,296 +5,300 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Defihaus — Acceso</title>
+<title>Defihaus — Narvarte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body {
-    background: #0a0a0a;
-    color: #e5e5e5;
-    font-family: -apple-system, 'SF Pro Display', system-ui, sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 60px 24px 40px;
-    user-select: none;
-  }
-  .brand { font-size: 10px; letter-spacing: 4px; color: #3a3a3a; text-transform: uppercase; font-weight: 600; margin-bottom: 40px; }
-  .circle { width: 200px; height: 200px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 28px; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
-  .circle.idle { background: radial-gradient(circle, #171717 0%, #0f0f0f 50%, #0a0a0a 100%); border: 2px solid #2a2a2a; box-shadow: 0 0 40px rgba(0,0,0,0.4); }
-  .circle.opening { background: radial-gradient(circle, #1e1b4b 0%, #0f0a2e 50%, #0a0a0a 100%); border: 2px solid #818cf8; box-shadow: 0 0 60px rgba(129,140,248,0.15); cursor: default; }
-  .circle.success { background: radial-gradient(circle, #065f46 0%, #064e3b 50%, #0a0a0a 100%); border: 2px solid #34d399; box-shadow: 0 0 80px rgba(52,211,153,0.2); cursor: default; }
-  .circle.error { background: radial-gradient(circle, #2a0a0a 0%, #0a0a0a 100%); border: 2px solid #f87171; box-shadow: 0 0 40px rgba(248,113,113,0.1); cursor: default; }
-  .circle.rate { background: radial-gradient(circle, #2a1a0a 0%, #0a0a0a 100%); border: 2px solid #fb923c; box-shadow: 0 0 40px rgba(251,146,60,0.1); cursor: default; }
-  .circle.inactive { background: radial-gradient(circle, #0f0f0f 0%, #0a0a0a 100%); border: 2px solid #1a1a1a; cursor: default; }
-  .label { font-size: 17px; font-weight: 600; margin-bottom: 8px; transition: color 0.3s; text-align: center; }
-  .sublabel { font-size: 11px; color: #3a3a3a; }
-  .spinner { width: 40px; height: 40px; border: 2px solid #2a2a4a; border-top: 2px solid #818cf8; border-radius: 50%; animation: spin 0.7s linear infinite; }
-  .spinner-sm { display: inline-block; width: 18px; height: 18px; border: 2px solid #1a1a1a; border-top: 2px solid #525252; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 16px; }
-  .loading-text { font-size: 13px; color: #525252; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  #app { opacity: 0; transition: opacity 0.3s; }
-  #app.ready { opacity: 1; }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#0a0a0a;color:#e5e5e5;font-family:'DM Sans',-apple-system,system-ui,sans-serif;min-height:100vh;user-select:none}
+.brand{font-size:10px;letter-spacing:4px;color:#3a3a3a;text-transform:uppercase;font-weight:600;text-align:center;padding:48px 0 32px}
+#content{display:flex;flex-direction:column;align-items:center;padding:0 20px}
 
-  /* PIN entry */
-  .pin-container { text-align: center; width: 100%; max-width: 320px; }
-  .pin-title { font-size: 16px; font-weight: 600; color: #d4d4d4; margin-bottom: 6px; }
-  .pin-sub { font-size: 13px; color: #525252; margin-bottom: 28px; }
-  .pin-inputs { display: flex; gap: 8px; justify-content: center; margin-bottom: 24px; }
-  .pin-digit { width: 48px; height: 56px; background: #141414; border: 1px solid #262626; border-radius: 10px; color: #e5e5e5; font-size: 24px; text-align: center; outline: none; font-family: 'Courier New', monospace; font-weight: 700; -webkit-appearance: none; }
-  .pin-digit:focus { border-color: #525252; }
-  .pin-digit.error { border-color: #f87171; }
-  .pin-btn { width: 100%; padding: 16px; background: #e5e5e5; color: #0a0a0a; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-  .pin-btn:disabled { background: #1a1a1a; color: #3a3a3a; cursor: default; }
-  .pin-error { font-size: 13px; color: #f87171; margin-top: 12px; }
-  .pin-icon { width: 80px; height: 80px; border-radius: 50%; background: #141414; border: 1px solid #1f1f1f; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; }
+/* Door */
+.door-section{display:flex;flex-direction:column;align-items:center;margin-bottom:20px}
+.circle{width:180px;height:180px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:24px;transition:all .5s cubic-bezier(.4,0,.2,1);cursor:pointer}
+.circle.idle{background:radial-gradient(circle,#171717,#0f0f0f 50%,#0a0a0a);border:2px solid #2a2a2a;box-shadow:0 0 40px rgba(0,0,0,.4)}
+.circle.opening{background:radial-gradient(circle,#1e1b4b,#0f0a2e 50%,#0a0a0a);border:2px solid #818cf8;box-shadow:0 0 60px rgba(129,140,248,.15);cursor:default}
+.circle.success{background:radial-gradient(circle,#065f46,#064e3b 50%,#0a0a0a);border:2px solid #34d399;box-shadow:0 0 80px rgba(52,211,153,.2);cursor:default}
+.circle.error{background:radial-gradient(circle,#2a0a0a,#0a0a0a);border:2px solid #f87171;box-shadow:0 0 40px rgba(248,113,113,.1);cursor:default}
+.circle.rate{background:radial-gradient(circle,#2a1a0a,#0a0a0a);border:2px solid #fb923c;cursor:default}
+.circle.inactive{background:radial-gradient(circle,#0f0f0f,#0a0a0a);border:2px solid #1a1a1a;cursor:default}
+.label{font-size:17px;font-weight:600;margin-bottom:6px;transition:color .3s;text-align:center}
+.sublabel{font-size:11px;color:#3a3a3a}
+.spinner{width:40px;height:40px;border:2px solid #2a2a4a;border-top:2px solid #818cf8;border-radius:50%;animation:spin .7s linear infinite}
+.spinner-sm{display:inline-block;width:18px;height:18px;border:2px solid #1a1a1a;border-top:2px solid #525252;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+#app{opacity:0;transition:opacity .3s}
+#app.ready{opacity:1}
 
-  /* Info cards */
-  .info-section { width: 100%; max-width: 380px; margin-top: 40px; }
-  .info-card { background: #141414; border: 1px solid #1f1f1f; border-radius: 14px; margin-bottom: 10px; overflow: hidden; }
-  .info-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; }
-  .info-header-left { display: flex; align-items: center; gap: 10px; }
-  .info-icon { font-size: 18px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: #1a1a1a; }
-  .info-title { font-size: 14px; font-weight: 600; color: #d4d4d4; }
-  .info-chevron { color: #3a3a3a; transition: transform 0.3s; font-size: 12px; }
-  .info-chevron.open { transform: rotate(180deg); }
-  .info-body { display: none; padding: 0 16px 14px; font-size: 13px; color: #a3a3a3; line-height: 1.7; }
-  .info-body.open { display: block; }
-  .wifi-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #1a1a1a; }
-  .wifi-item:last-child { border-bottom: none; }
-  .wifi-name { font-size: 12px; color: #737373; }
-  .wifi-value { font-family: 'Courier New', monospace; font-size: 12px; color: #e5e5e5; background: #1a1a1a; padding: 3px 8px; border-radius: 4px; cursor: pointer; }
-  .wifi-pass { margin-top: 10px; padding: 10px 12px; background: #1a1a1a; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
-  .wifi-pass-label { font-size: 11px; color: #525252; }
-  .wifi-pass-value { font-family: 'Courier New', monospace; font-size: 13px; color: #4ade80; cursor: pointer; }
-  .rule-item { padding: 5px 0; display: flex; gap: 8px; align-items: flex-start; }
-  .rule-emoji { font-size: 14px; flex-shrink: 0; }
-  .rule-text { font-size: 12px; color: #a3a3a3; line-height: 1.5; }
-  .copy-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #34d399; color: #0a0a0a; padding: 8px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100; }
-  .copy-toast.show { opacity: 1; }
+/* PIN */
+.pin-container{text-align:center;width:100%;max-width:320px}
+.pin-icon{width:72px;height:72px;border-radius:50%;background:#141414;border:1px solid #1f1f1f;display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+.pin-title{font-size:16px;font-weight:600;color:#d4d4d4;margin-bottom:6px}
+.pin-sub{font-size:13px;color:#525252;margin-bottom:24px}
+.pin-inputs{display:flex;gap:8px;justify-content:center;margin-bottom:20px}
+.pin-digit{width:46px;height:54px;background:#141414;border:1px solid #262626;border-radius:10px;color:#e5e5e5;font-size:24px;text-align:center;outline:none;font-family:'Courier New',monospace;font-weight:700;-webkit-appearance:none}
+.pin-digit:focus{border-color:#525252}
+.pin-digit.err{border-color:#f87171}
+.pin-btn{width:100%;padding:15px;background:#e5e5e5;color:#0a0a0a;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit}
+.pin-btn:disabled{background:#1a1a1a;color:#3a3a3a;cursor:default}
+.pin-error{font-size:13px;color:#f87171;margin-top:10px}
+
+/* Guide section */
+.guide{width:100%;max-width:420px;margin:0 auto;padding:0 0 60px}
+.guide-hero{text-align:center;padding:32px 0 8px}
+.guide-hero h2{font-size:22px;font-weight:700;color:#fff;margin-bottom:4px}
+.guide-hero p{font-size:12px;color:#525252;line-height:1.5}
+.guide-divider{height:1px;background:linear-gradient(90deg,transparent,#262626,transparent);margin:20px 0}
+
+/* Cards */
+.card{background:#141414;border:1px solid #1f1f1f;border-radius:14px;margin-bottom:10px;overflow:hidden}
+.card-h{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer}
+.card-hl{display:flex;align-items:center;gap:10px}
+.card-ico{font-size:18px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#1a1a1a}
+.card-t{font-size:14px;font-weight:600;color:#d4d4d4}
+.card-badge{font-size:9px;color:#525252;background:#1a1a1a;padding:2px 7px;border-radius:4px;margin-left:6px}
+.chev{color:#3a3a3a;transition:transform .3s;font-size:11px}
+.chev.open{transform:rotate(180deg)}
+.card-b{display:none;padding:0 16px 14px}
+.card-b.open{display:block}
+
+/* Place items */
+.place{padding:12px 0;border-bottom:1px solid #1a1a1a}
+.place:last-child{border-bottom:none}
+.place-name{font-size:13px;font-weight:600;color:#e5e5e5;margin-bottom:2px}
+.place-cat{font-size:10px;color:#525252;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.place-desc{font-size:12px;color:#737373;line-height:1.5;margin-bottom:4px}
+.place-meta{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:#525252}
+.place-meta span{display:flex;align-items:center;gap:3px}
+
+/* WiFi */
+.wifi-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1a1a1a}
+.wifi-item:last-child{border-bottom:none}
+.wifi-name{font-size:12px;color:#737373}
+.wifi-val{font-family:'Courier New',monospace;font-size:12px;color:#e5e5e5;background:#1a1a1a;padding:3px 8px;border-radius:4px;cursor:pointer}
+.wifi-pass{margin-top:10px;padding:10px 12px;background:#1a1a1a;border-radius:8px;display:flex;justify-content:space-between;align-items:center}
+.wifi-pass-l{font-size:11px;color:#525252}
+.wifi-pass-v{font-family:'Courier New',monospace;font-size:13px;color:#4ade80;cursor:pointer}
+
+/* Rules */
+.rule{padding:5px 0;display:flex;gap:8px;align-items:flex-start}
+.rule em{font-size:14px;flex-shrink:0;font-style:normal}
+.rule span{font-size:12px;color:#a3a3a3;line-height:1.5}
+
+/* Transport */
+.metro-line{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600;margin:2px 4px 2px 0}
+.ml-3{background:#4a7c3f;color:#fff}
+.ml-9{background:#6e3a20;color:#fff}
+.ml-12{background:#a68b2c;color:#fff}
+.metro-station{padding:8px 0;border-bottom:1px solid #1a1a1a;font-size:12px;color:#a3a3a3;line-height:1.5}
+.metro-station:last-child{border-bottom:none}
+.metro-station strong{color:#e5e5e5;font-weight:600}
+
+/* Tips */
+.tip{padding:10px 0;border-bottom:1px solid #1a1a1a;font-size:12px;color:#a3a3a3;line-height:1.6}
+.tip:last-child{border-bottom:none}
+.tip strong{color:#d4d4d4}
+
+/* Toast */
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#34d399;color:#0a0a0a;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:100}
+.toast.show{opacity:1}
+
+/* Emergency */
+.emergency{display:flex;align-items:center;gap:10px;padding:12px;background:#1a1a1a;border-radius:10px;margin-top:6px}
+.emergency-ico{font-size:20px}
+.emergency-info{flex:1}
+.emergency-info div:first-child{font-size:13px;font-weight:600;color:#e5e5e5}
+.emergency-info div:last-child{font-size:11px;color:#525252}
 </style>
 </head>
 <body>
 <div id="app">
-  <div class="brand">Defihaus</div>
+  <div class="brand">Defihaus · Narvarte</div>
   <div id="content"></div>
 </div>
-<div class="copy-toast" id="toast">Copiado</div>
+<div class="toast" id="toast">Copiado</div>
 
 <script>
-const WORKER_URL = "https://puerta-narvarte.danielangelfidel.workers.dev";
-const ACCESS_KEY = "dh-narv-2026-secreto";
+const WORKER_URL="https://puerta-narvarte.danielangelfidel.workers.dev";
+const ACCESS_KEY="dh-narv-2026-secreto";
+const $=id=>document.getElementById(id);
+let doorState="idle",currentPin="";
 
-const $ = (id) => document.getElementById(id);
-let doorState = "idle";
-let currentPin = "";
+function renderLoading(){$("content").innerHTML='<div class="spinner-sm"></div><div style="font-size:13px;color:#525252">Cargando...</div>';$("app").classList.add("ready")}
 
-function renderLoading() {
-  $("content").innerHTML = '<div class="spinner-sm"></div><div class="loading-text">Cargando...</div>';
-  $("app").classList.add("ready");
+function renderPinEntry(){
+$("content").innerHTML=`
+<div class="pin-container">
+  <div class="pin-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 5-5v0a5 5 0 0 1 5 5v4"/></svg></div>
+  <div class="pin-title">Ingresa tu PIN</div>
+  <div class="pin-sub">El PIN de 6 dígitos que recibiste por Airbnb</div>
+  <div class="pin-inputs"><input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="0" autofocus><input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="1"><input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="2"><input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="3"><input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="4"><input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="5"></div>
+  <button class="pin-btn" id="pinBtn" onclick="verifyPin()" disabled>Verificar</button>
+  <div class="pin-error" id="pinError"></div>
+</div>`;
+const d=document.querySelectorAll(".pin-digit");
+d.forEach((el,i)=>{el.addEventListener("input",()=>{el.value=el.value.replace(/[^0-9]/g,"");if(el.value&&i<5)d[i+1].focus();updBtn()});el.addEventListener("keydown",e=>{if(e.key==="Backspace"&&!el.value&&i>0){d[i-1].focus();d[i-1].value=""}});el.addEventListener("paste",e=>{e.preventDefault();const t=(e.clipboardData||window.clipboardData).getData("text").replace(/[^0-9]/g,"");for(let j=0;j<Math.min(t.length,6);j++)d[j].value=t[j];if(t.length>=6)d[5].focus();updBtn()})})
 }
+function updBtn(){const d=document.querySelectorAll(".pin-digit");currentPin=Array.from(d).map(x=>x.value).join("");$("pinBtn").disabled=currentPin.length!==6}
 
-// ---- PIN ENTRY SCREEN ----
-function renderPinEntry() {
-  $("content").innerHTML = `
-    <div class="pin-container">
-      <div class="pin-icon">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-          <path d="M7 11V7a5 5 0 0 1 5-5v0a5 5 0 0 1 5 5v4"/>
-        </svg>
-      </div>
-      <div class="pin-title">Ingresa tu PIN de acceso</div>
-      <div class="pin-sub">Recibiste un PIN de 6 dígitos en tu mensaje de Airbnb</div>
-      <div class="pin-inputs">
-        <input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="0" autofocus>
-        <input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="1">
-        <input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="2">
-        <input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="3">
-        <input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="4">
-        <input class="pin-digit" type="tel" maxlength="1" inputmode="numeric" data-i="5">
-      </div>
-      <button class="pin-btn" id="pinBtn" onclick="verifyPin()" disabled>Verificar</button>
-      <div class="pin-error" id="pinError"></div>
-    </div>
-  `;
+async function verifyPin(){$("pinBtn").disabled=true;$("pinBtn").textContent="Verificando...";$("pinError").textContent="";
+try{const r=await fetch(WORKER_URL+"/api/verify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pin:currentPin})});const d=await r.json();
+if(d.valid){renderActive(d,currentPin)}
+else if(d.error==="wrong_pin"){$("pinError").textContent="PIN incorrecto";document.querySelectorAll(".pin-digit").forEach(x=>{x.classList.add("err");x.value=""});document.querySelector(".pin-digit").focus();$("pinBtn").textContent="Verificar"}
+else if(d.error==="no_reservation"){$("pinError").textContent="No hay reserva activa en este momento";$("pinBtn").textContent="Verificar"}
+else{$("pinError").textContent="Error, intenta de nuevo";$("pinBtn").textContent="Verificar"}
+}catch(e){$("pinError").textContent="Error de conexión";$("pinBtn").textContent="Verificar"}}
 
-  const digits = document.querySelectorAll(".pin-digit");
-  digits.forEach((d, i) => {
-    d.addEventListener("input", (e) => {
-      d.value = d.value.replace(/[^0-9]/g, "");
-      if (d.value && i < 5) digits[i+1].focus();
-      updatePinBtn();
-    });
-    d.addEventListener("keydown", (e) => {
-      if (e.key === "Backspace" && !d.value && i > 0) { digits[i-1].focus(); digits[i-1].value = ""; }
-    });
-    d.addEventListener("paste", (e) => {
-      e.preventDefault();
-      const text = (e.clipboardData || window.clipboardData).getData("text").replace(/[^0-9]/g, "");
-      for (let j = 0; j < Math.min(text.length, 6); j++) {
-        digits[j].value = text[j];
-      }
-      if (text.length >= 6) digits[5].focus();
-      updatePinBtn();
-    });
-  });
-}
+function renderActive(data,pin){
+const co=data.checkOut?new Date(data.checkOut).toLocaleDateString("es-MX",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";
+$("content").innerHTML=`
+<div class="door-section">
+  <div style="font-size:14px;color:#525252;margin-bottom:24px">Bienvenido a Narvarte</div>
+  <div class="circle idle" id="door" onclick="openDoor()"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#d4d4d4" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+  <div class="label" id="doorLabel" style="color:#e5e5e5">Toca para abrir</div>
+  ${co?'<div class="sublabel">Acceso hasta '+co+'</div>':""}
+</div>
+<div class="guide">
+  <div class="guide-divider"></div>
 
-function updatePinBtn() {
-  const digits = document.querySelectorAll(".pin-digit");
-  const pin = Array.from(digits).map(d => d.value).join("");
-  $("pinBtn").disabled = pin.length !== 6;
-  currentPin = pin;
-}
+  <!-- WiFi -->
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">📶</div><div class="card-t">WiFi</div></div><div class="chev">▼</div></div>
+  <div class="card-b">
+    <div class="wifi-item"><span class="wifi-name">Red general (5G)</span><span class="wifi-val" onclick="cp('Totalplay-D4B5-5G-EXT')">Totalplay-D4B5-5G-EXT</span></div>
+    <div class="wifi-item"><span class="wifi-name">Recámara 1</span><span class="wifi-val" onclick="cp('Totalplay-D4B5_EXT_2')">Totalplay-D4B5_EXT_2</span></div>
+    <div class="wifi-item"><span class="wifi-name">Recámara 2</span><span class="wifi-val" onclick="cp('Totalplay-D4B5')">Totalplay-D4B5</span></div>
+    <div class="wifi-pass"><span class="wifi-pass-l">Contraseña (todas)</span><span class="wifi-pass-v" onclick="cp('D4B55712gde5SmAq')">D4B55712gde5SmAq</span></div>
+  </div></div>
 
-async function verifyPin() {
-  $("pinBtn").disabled = true;
-  $("pinBtn").textContent = "Verificando...";
-  $("pinError").textContent = "";
+  <!-- RESTAURANTES -->
+  <div class="guide-hero"><h2>Guía de Narvarte</h2><p>Los mejores spots del barrio, seleccionados por locales</p></div>
 
-  try {
-    const res = await fetch(WORKER_URL + "/api/verify", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pin: currentPin }),
-    });
-    const data = await res.json();
-    if (data.valid) {
-      renderActive(data, currentPin);
-    } else if (data.error === "wrong_pin") {
-      $("pinError").textContent = "PIN incorrecto. Verifica e intenta de nuevo.";
-      document.querySelectorAll(".pin-digit").forEach(d => { d.classList.add("error"); d.value = ""; });
-      document.querySelector(".pin-digit").focus();
-      $("pinBtn").textContent = "Verificar";
-    } else if (data.error === "no_reservation") {
-      $("pinError").textContent = "No hay reserva activa en este momento.";
-      $("pinBtn").textContent = "Verificar";
-    } else {
-      $("pinError").textContent = "Error. Intenta de nuevo.";
-      $("pinBtn").textContent = "Verificar";
-    }
-  } catch {
-    $("pinError").textContent = "Error de conexión. Intenta de nuevo.";
-    $("pinBtn").textContent = "Verificar";
-  }
-}
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🌮</div><div class="card-t">Tacos</div><div class="card-badge">IMPERDIBLES</div></div><div class="chev">▼</div></div>
+  <div class="card-b">
+    <div class="place"><div class="place-name">El Vilsito</div><div class="place-cat">Tacos al pastor</div><div class="place-desc">De día es taller mecánico, de noche es la taquería más legendaria de la Narvarte. Apareció en Las Crónicas del Taco de Netflix. El pastor es espectacular.</div><div class="place-meta"><span>📍 Av. Universidad esq. Petén</span><span>🕐 Noches</span><span>💰 $</span></div></div>
+    <div class="place"><div class="place-name">Tacos Tony</div><div class="place-cat">Suadero · Campechanos</div><div class="place-desc">Más de 15 años sirviendo el mejor suadero de la zona. Abierto prácticamente 24 horas. Los campechanos son obligatorios.</div><div class="place-meta"><span>📍 Frente a El Vilsito</span><span>🕐 24h casi</span><span>💰 $</span></div></div>
+    <div class="place"><div class="place-name">Cuatro de Birria</div><div class="place-cat">Birria en todas sus formas</div><div class="place-desc">Taco blando, dorado, birriamen, birriasquites, pizzabirria. Los viernes: toda la birria que puedas comer por $155.</div><div class="place-meta"><span>📍 Caleta 554</span><span>🕐 9:00-21:30</span><span>💰 $$</span></div></div>
+  </div></div>
 
-// ---- DOOR + INFO SCREEN ----
-function renderActive(data, pin) {
-  const coDate = data.checkOut ? new Date(data.checkOut).toLocaleDateString("es-MX", {
-    weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit"
-  }) : "";
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🍽️</div><div class="card-t">Restaurantes</div></div><div class="chev">▼</div></div>
+  <div class="card-b">
+    <div class="place"><div class="place-name">Rincón</div><div class="place-cat">Brunch · Mexicano contemporáneo</div><div class="place-desc">El spot perfecto para desayuno o brunch. Por la mañana café y pan de masa madre, por la tarde se transforma en wine bar.</div><div class="place-meta"><span>📍 Heriberto Frías 205</span><span>💰 $$</span></div></div>
+    <div class="place"><div class="place-name">Rudo</div><div class="place-cat">Fusión asiática</div><div class="place-desc">Cocina de Japón, Corea y Medio Oriente adaptada al paladar mexicano. Los springrolls de shortrib son el estelar. Platos enormes, ve acompañado.</div><div class="place-meta"><span>📍 Narvarte Poniente</span><span>💰 $$</span></div></div>
+    <div class="place"><div class="place-name">Socarrat Arrocería</div><div class="place-cat">Cocina española · Paella</div><div class="place-desc">Paella auténtica española, tapas, croquetas. Mesas en la banqueta, ambiente informal. Paella los jueves, sábados y domingos.</div><div class="place-meta"><span>📍 Narvarte Poniente</span><span>💰 $$</span></div></div>
+    <div class="place"><div class="place-name">Marea Alta</div><div class="place-cat">Cevichería · Mariscos</div><div class="place-desc">Ceviche y aguachiles con sabores auténticos de la costa del Pacífico. Todo hecho al momento con ingredientes del día.</div><div class="place-meta"><span>📍 Narvarte</span><span>💰 $$</span></div></div>
+    <div class="place"><div class="place-name">La Secina</div><div class="place-cat">Antojería mexicana</div><div class="place-desc">Cocina honesta de herencia mexicana. Trabajan con productores 100% locales. Las tlayudas y la cecina son de otro nivel.</div><div class="place-meta"><span>📍 Narvarte</span><span>💰 $$</span></div></div>
+    <div class="place"><div class="place-name">Szechuan Gourmet</div><div class="place-cat">Comida china auténtica</div><div class="place-desc">Sabores auténticos de Sichuan. Picante de verdad, aromático y adictivo. De los mejores chinos de CDMX.</div><div class="place-meta"><span>📍 Narvarte</span><span>💰 $$-$$$</span></div></div>
+    <div class="place"><div class="place-name">Hola Bonita</div><div class="place-cat">Tortillería gourmet</div><div class="place-desc">Tortillería repleta de colores vibrantes. Tortillas de todos colores y sabores. Experiencia visual y gastronómica.</div><div class="place-meta"><span>📍 Av. Universidad 217</span><span>🕐 8:30-17:00</span><span>💰 $</span></div></div>
+  </div></div>
 
-  $("content").innerHTML = `
-    <div style="font-size:14px;color:#525252;margin-bottom:28px">Bienvenido</div>
-    <div class="circle idle" id="door" onclick="openDoor()">
-      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#d4d4d4" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-      </svg>
-    </div>
-    <div class="label" id="doorLabel" style="color:#e5e5e5">Toca para abrir</div>
-    ${coDate ? '<div class="sublabel">Acceso hasta ' + coDate + '</div>' : ""}
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">☕</div><div class="card-t">Cafeterías</div></div><div class="chev">▼</div></div>
+  <div class="card-b">
+    <div class="place"><div class="place-name">Alquimia Café</div><div class="place-cat">Café de especialidad</div><div class="place-desc">Baristas premiados a nivel nacional. Granos mexicanos, varios métodos de extracción. Su cold brew es de los mejores de la ciudad.</div><div class="place-meta"><span>📍 Narvarte</span><span>💰 $$</span></div></div>
+    <div class="place"><div class="place-name">Antenati Café</div><div class="place-cat">Café · Talleres creativos</div><div class="place-desc">Café de especialidad + talleres de cerámica, joyería, acuarela y bordado los sábados. Consulta su IG para el calendario.</div><div class="place-meta"><span>📍 Xochicalco 273</span><span>🕐 L-V 10:00-19:00</span><span>💰 $</span></div></div>
+  </div></div>
 
-    <div class="info-section">
-      <div class="info-card">
-        <div class="info-header" onclick="toggleCard(this)">
-          <div class="info-header-left"><div class="info-icon">📶</div><div class="info-title">WiFi</div></div>
-          <div class="info-chevron">▼</div>
-        </div>
-        <div class="info-body">
-          <div class="wifi-item"><span class="wifi-name">Red general</span><span class="wifi-value" onclick="copyText('Totalplay-D4B5-5G-EXT')">Totalplay-D4B5-5G-EXT</span></div>
-          <div class="wifi-item"><span class="wifi-name">Recámara 1</span><span class="wifi-value" onclick="copyText('Totalplay-D4B5_EXT_2')">Totalplay-D4B5_EXT_2</span></div>
-          <div class="wifi-item"><span class="wifi-name">Recámara 2</span><span class="wifi-value" onclick="copyText('Totalplay-D4B5')">Totalplay-D4B5</span></div>
-          <div class="wifi-pass"><span class="wifi-pass-label">Contraseña (todas)</span><span class="wifi-pass-value" onclick="copyText('D4B55712gde5SmAq')">D4B55712gde5SmAq</span></div>
-        </div>
-      </div>
-      <div class="info-card">
-        <div class="info-header" onclick="toggleCard(this)">
-          <div class="info-header-left"><div class="info-icon">📋</div><div class="info-title">Reglas de la casa</div></div>
-          <div class="info-chevron">▼</div>
-        </div>
-        <div class="info-body">
-          <div class="rule-item"><span class="rule-emoji">🚷</span><span class="rule-text">No está permitido el ingreso de visitas ni personas adicionales a las registradas.</span></div>
-          <div class="rule-item"><span class="rule-emoji">❌</span><span class="rule-text">No se permiten fiestas ni reuniones.</span></div>
-          <div class="rule-item"><span class="rule-emoji">🚫</span><span class="rule-text">Prohibido fumar o vapear dentro del alojamiento.</span></div>
-          <div class="rule-item"><span class="rule-emoji">🔇</span><span class="rule-text">Respeta los horarios de silencio.</span></div>
-          <div class="rule-item"><span class="rule-emoji">🍽️</span><span class="rule-text">Después de usar la cocina, lava y deja limpio todo lo que hayas utilizado.</span></div>
-          <div class="rule-item"><span class="rule-emoji">🧹</span><span class="rule-text">Mantén las áreas comunes limpias y ordenadas. No dejes ropa ni objetos personales en áreas comunes.</span></div>
-          <div class="rule-item"><span class="rule-emoji">♻️</span><span class="rule-text">La basura debe tirarse diariamente en el contenedor de la planta baja, justo debajo del apartamento.</span></div>
-          <div class="rule-item"><span class="rule-emoji">🔐</span><span class="rule-text">Asegúrate de cerrar bien puertas y ventanas al salir.</span></div>
-          <div class="rule-item"><span class="rule-emoji">🏡</span><span class="rule-text">Cuida nuestra casa como si fuera tuya. Evita dañar o romper cualquier objeto.</span></div>
-        </div>
-      </div>
-      <div style="text-align:center;margin-top:16px;padding:12px;font-size:12px;color:#3a3a3a;line-height:1.6">
-        ✨ Agradecemos tu respeto y colaboración.<br>¡Te deseamos una estancia muy agradable!
-      </div>
-    </div>
-  `;
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🍔</div><div class="card-t">Burgers & Snacks</div></div><div class="chev">▼</div></div>
+  <div class="card-b">
+    <div class="place"><div class="place-name">Secret Burgers</div><div class="place-cat">Speakeasy de hamburguesas</div><div class="place-desc">Escondido detrás de una casa normal. Hamburguesas de pan brioche bañadas en queso, boneless, costillas. El panque de elote de postre es obligatorio.</div><div class="place-meta"><span>📍 Anaxágoras 607-3</span><span>🕐 Mié-Sáb 13-21h</span><span>💰 $$</span></div></div>
+    <div class="place"><div class="place-name">Lúpulo Pizza</div><div class="place-cat">Pizza artesanal · Cerveza</div><div class="place-desc">Pizza y chela en un ambiente relajado. Perfecto para pasar horas platicando sin presiones.</div><div class="place-meta"><span>📍 Narvarte</span><span>💰 $$</span></div></div>
+  </div></div>
 
-  // Store pin for door opening
-  currentPin = pin;
-}
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🍷</div><div class="card-t">Bares</div></div><div class="chev">▼</div></div>
+  <div class="card-b">
+    <div class="place"><div class="place-name">Manada</div><div class="place-cat">Vinos naturales · Coctelería</div><div class="place-desc">Bar minimalista con vinos naturales, vermouths y coctelería hecha exclusivamente con destilados mexicanos. Pop-ups gastronómicos entre semana.</div><div class="place-meta"><span>📍 Narvarte</span><span>💰 $$</span></div></div>
+  </div></div>
 
-function updateDoor(state) {
-  doorState = state;
-  const circle = $("door");
-  const label = $("doorLabel");
-  if (!circle || !label) return;
-  circle.className = "circle " + state;
-  const icons = {
-    idle: '<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#d4d4d4" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
-    opening: '<div class="spinner"></div>',
-    success: '<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
-    error: '<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
-    rate: '<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
-  };
-  const labels = {
-    idle: { text: "Toca para abrir", color: "#e5e5e5" },
-    opening: { text: "Abriendo...", color: "#818cf8" },
-    success: { text: "Puerta abierta", color: "#34d399" },
-    error: { text: "Error — intenta de nuevo", color: "#f87171" },
-    rate: { text: "Espera un momento", color: "#fb923c" },
-  };
-  circle.innerHTML = icons[state] || icons.idle;
-  label.textContent = labels[state] ? labels[state].text : "";
-  label.style.color = labels[state] ? labels[state].color : "#e5e5e5";
-}
+  <div class="guide-divider"></div>
 
-async function openDoor() {
-  if (doorState !== "idle") return;
-  updateDoor("opening");
-  try {
-    const res = await fetch(WORKER_URL + "/api/open", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pin: currentPin }),
-    });
-    if (res.status === 429) { updateDoor("rate"); setTimeout(() => updateDoor("idle"), 5000); return; }
-    const data = await res.json();
-    if (data.success) { updateDoor("success"); setTimeout(() => updateDoor("idle"), 4000); }
-    else { updateDoor("error"); setTimeout(() => updateDoor("idle"), 3000); }
-  } catch { updateDoor("error"); setTimeout(() => updateDoor("idle"), 3000); }
-}
+  <!-- TRANSPORTE -->
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🚇</div><div class="card-t">Transporte</div></div><div class="chev">▼</div></div>
+  <div class="card-b">
+    <div style="font-size:12px;color:#737373;margin-bottom:10px">Estaciones de metro cercanas:</div>
+    <div class="metro-station"><strong>Etiopía</strong> <span class="metro-line ml-3">L3</span> — 5 min caminando</div>
+    <div class="metro-station"><strong>Eugenia</strong> <span class="metro-line ml-3">L3</span> — 10 min caminando</div>
+    <div class="metro-station"><strong>División del Norte</strong> <span class="metro-line ml-3">L3</span> — 12 min caminando</div>
+    <div class="metro-station"><strong>Centro Médico</strong> <span class="metro-line ml-3">L3</span> <span class="metro-line ml-9">L9</span> — 15 min caminando</div>
+    <div style="font-size:12px;color:#737373;margin:12px 0 8px">Otros:</div>
+    <div class="tip"><strong>Metrobús:</strong> Línea 1 sobre Insurgentes (estación Poliforum o Parque Hundido). Conecta norte-sur de la ciudad.</div>
+    <div class="tip"><strong>Uber/DiDi/Beat:</strong> Funcionan perfecto en la zona. Tiempo promedio de espera 3-5 min.</div>
+    <div class="tip"><strong>Metro cuesta $5 MXN</strong> (~$0.25 USD). Metrobús $6 MXN. Ambos con tarjeta recargable que compras en cualquier estación.</div>
+    <div class="tip"><strong>Al aeropuerto (AICM):</strong> Uber ~$150-250 MXN / 30-45 min. Metro Línea 3 → transbordo L9 Terminal Aérea.</div>
+  </div></div>
 
-function toggleCard(header) {
-  header.nextElementSibling.classList.toggle('open');
-  header.querySelector('.info-chevron').classList.toggle('open');
-}
+  <!-- COMPRAS -->
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🛒</div><div class="card-t">Supermercados y tiendas</div></div><div class="chev">▼</div></div>
+  <div class="card-b">
+    <div class="place"><div class="place-name">Parque Delta</div><div class="place-desc">Centro comercial grande con supermercado, cine, tiendas de ropa y food court. A 10 min caminando.</div></div>
+    <div class="place"><div class="place-name">Plaza Universidad</div><div class="place-desc">Centro comercial con Sears, Liverpool, cine y restaurantes. 15 min en Uber.</div></div>
+    <div class="place"><div class="place-name">OXXO / 7-Eleven</div><div class="place-desc">Tiendas de conveniencia 24h en cada esquina. Para snacks, bebidas y retiro de efectivo.</div></div>
+    <div class="place"><div class="place-name">Mercado Narvarte</div><div class="place-desc">Mercado tradicional mexicano. Fruta fresca, comida casera, jugos naturales. Experiencia auténtica y precios locales.</div></div>
+  </div></div>
 
-function copyText(text) {
-  navigator.clipboard.writeText(text).then(() => {
-    $("toast").classList.add("show");
-    setTimeout(() => $("toast").classList.remove("show"), 1500);
-  });
-}
+  <!-- CULTURA -->
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🎭</div><div class="card-t">Cultura y lugares</div></div><div class="chev">▼</div></div>
+  <div class="card-b">
+    <div class="place"><div class="place-name">Cineteca Nacional</div><div class="place-desc">El templo del cine en México. Películas de arte, festivales, documentales. A 15 min en Uber.</div></div>
+    <div class="place"><div class="place-name">Parque de las Américas</div><div class="place-desc">El parque favorito de los locales. Zona para perros, área verde y un buen lugar para correr o leer.</div></div>
+    <div class="place"><div class="place-name">Templo de la Medalla Milagrosa</div><div class="place-desc">Iglesia icónica diseñada por Félix Candela. Su estructura hiperbólica es una obra maestra de la arquitectura moderna.</div></div>
+    <div class="place"><div class="place-name">World Trade Center</div><div class="place-desc">Centro de convenciones y eventos. Conciertos, expos y el restaurante giratorio Bellini en el piso 45.</div></div>
+    <div class="place"><div class="place-name">Glorieta SCOP</div><div class="place-desc">El corazón de la Narvarte. La fuente rodeada de palmeras donde convergen las avenidas principales. Perfecta para pasear.</div></div>
+  </div></div>
 
-// ---- INIT ----
-function init() {
-  renderLoading();
-  setTimeout(() => { renderPinEntry(); }, 500);
-}
+  <!-- TIPS -->
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">💡</div><div class="card-t">Tips para tu estancia</div></div><div class="chev">▼</div></div>
+  <div class="card-b">
+    <div class="tip"><strong>Seguridad:</strong> Narvarte es un barrio tranquilo y seguro. Como en toda gran ciudad, cuida tus pertenencias y evita caminar solo muy tarde por calles oscuras.</div>
+    <div class="tip"><strong>Propinas:</strong> 10-15% en restaurantes. En taquerías callejeras no es obligatorio pero se agradece dejar cambio.</div>
+    <div class="tip"><strong>Agua:</strong> No bebas agua del grifo. Compra garrafones o botellas en OXXO. En restaurantes el agua es segura.</div>
+    <div class="tip"><strong>Efectivo:</strong> Lleva algo de efectivo. Muchas taquerías y mercados no aceptan tarjeta. Los cajeros BBVA y Banorte son los más comunes.</div>
+    <div class="tip"><strong>Sismo:</strong> Si sientes un temblor, mantén la calma. Sal del edificio si puedes o ubícate junto a un muro de carga. La alarma sísmica suena antes del sismo.</div>
+    <div class="tip"><strong>Roma & Condesa:</strong> A solo 10 min en Uber. Más restaurantes, bares, galerías y vida nocturna. Paseo por Av. Ámsterdam.</div>
+    <div class="tip"><strong>Centro Histórico:</strong> 20 min en metro (L3 dirección Indios Verdes, bajar en Hidalgo o Bellas Artes). Zócalo, Palacio Nacional, Templo Mayor.</div>
+    <div class="tip"><strong>Coyoacán:</strong> 15 min en metro (L3 dirección Universidad, bajar en Coyoacán). Casa de Frida Kahlo, mercado de artesanías, helados en el jardín.</div>
+  </div></div>
+
+  <!-- EMERGENCIAS -->
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">🆘</div><div class="card-t">Emergencias</div></div><div class="chev">▼</div></div>
+  <div class="card-b">
+    <div class="emergency"><div class="emergency-ico">🚑</div><div class="emergency-info"><div>Emergencias: 911</div><div>Policía, ambulancia, bomberos</div></div></div>
+    <div class="emergency"><div class="emergency-ico">🏥</div><div class="emergency-info"><div>Hospital Ángeles del Pedregal</div><div>Hospital privado cercano</div></div></div>
+    <div class="emergency"><div class="emergency-ico">💊</div><div class="emergency-info"><div>Farmacias del Ahorro / Similares</div><div>Hay varias en la zona, algunas 24h</div></div></div>
+  </div></div>
+
+  <!-- REGLAS -->
+  <div class="guide-divider"></div>
+  <div class="card"><div class="card-h" onclick="tog(this)"><div class="card-hl"><div class="card-ico">📋</div><div class="card-t">Reglas de la casa</div></div><div class="chev">▼</div></div>
+  <div class="card-b">
+    <div class="rule"><em>🚷</em><span>No está permitido el ingreso de visitas ni personas adicionales a las registradas.</span></div>
+    <div class="rule"><em>❌</em><span>No se permiten fiestas ni reuniones.</span></div>
+    <div class="rule"><em>🚫</em><span>Prohibido fumar o vapear dentro del alojamiento.</span></div>
+    <div class="rule"><em>🔇</em><span>Respeta los horarios de silencio.</span></div>
+    <div class="rule"><em>🍽️</em><span>Después de usar la cocina, lava y deja limpio todo lo que hayas utilizado.</span></div>
+    <div class="rule"><em>🧹</em><span>Mantén las áreas comunes limpias y ordenadas. No dejes objetos personales en áreas comunes.</span></div>
+    <div class="rule"><em>♻️</em><span>La basura debe tirarse diariamente en el contenedor de la planta baja, justo debajo del apartamento.</span></div>
+    <div class="rule"><em>🔐</em><span>Asegúrate de cerrar bien puertas y ventanas al salir.</span></div>
+    <div class="rule"><em>🏡</em><span>Cuida nuestra casa como si fuera tuya.</span></div>
+  </div></div>
+
+  <div style="text-align:center;padding:24px 0 12px;font-size:12px;color:#2a2a2a;line-height:1.6">✨ Agradecemos tu respeto y colaboración<br>¡Disfruta Narvarte!</div>
+</div>`;currentPin=pin}
+
+function updDoor(s){doorState=s;const c=$("door"),l=$("doorLabel");if(!c||!l)return;c.className="circle "+s;
+const ic={idle:'<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#d4d4d4" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',opening:'<div class="spinner"></div>',success:'<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',error:'<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',rate:'<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'};
+const lb={idle:{t:"Toca para abrir",c:"#e5e5e5"},opening:{t:"Abriendo...",c:"#818cf8"},success:{t:"Puerta abierta",c:"#34d399"},error:{t:"Error — intenta de nuevo",c:"#f87171"},rate:{t:"Espera un momento",c:"#fb923c"}};
+c.innerHTML=ic[s]||ic.idle;l.textContent=lb[s]?lb[s].t:"";l.style.color=lb[s]?lb[s].c:"#e5e5e5"}
+
+async function openDoor(){if(doorState!=="idle")return;updDoor("opening");
+try{const r=await fetch(WORKER_URL+"/api/open",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pin:currentPin})});
+if(r.status===429){updDoor("rate");setTimeout(()=>updDoor("idle"),5000);return}
+const d=await r.json();if(d.success){updDoor("success");setTimeout(()=>updDoor("idle"),4000)}else{updDoor("error");setTimeout(()=>updDoor("idle"),3000)}}
+catch(e){updDoor("error");setTimeout(()=>updDoor("idle"),3000)}}
+
+function tog(h){h.nextElementSibling.classList.toggle("open");h.querySelector(".chev").classList.toggle("open")}
+function cp(t){navigator.clipboard.writeText(t).then(()=>{$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),1500)})}
+
+function init(){renderLoading();setTimeout(()=>renderPinEntry(),500)}
 init();
 </script>
 </body>
