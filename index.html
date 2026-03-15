@@ -16,8 +16,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 24px;
+    padding: 60px 24px 40px;
     user-select: none;
   }
   .brand {
@@ -116,6 +115,29 @@
   /* Hide everything until loaded */
   #app { opacity: 0; transition: opacity 0.3s; }
   #app.ready { opacity: 1; }
+
+  .info-section { width: 100%; max-width: 380px; margin-top: 40px; }
+  .info-card { background: #141414; border: 1px solid #1f1f1f; border-radius: 14px; margin-bottom: 10px; overflow: hidden; }
+  .info-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; }
+  .info-header-left { display: flex; align-items: center; gap: 10px; }
+  .info-icon { font-size: 18px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: #1a1a1a; }
+  .info-title { font-size: 14px; font-weight: 600; color: #d4d4d4; }
+  .info-chevron { color: #3a3a3a; transition: transform 0.3s; font-size: 12px; }
+  .info-chevron.open { transform: rotate(180deg); }
+  .info-body { display: none; padding: 0 16px 14px; font-size: 13px; color: #a3a3a3; line-height: 1.7; }
+  .info-body.open { display: block; }
+  .wifi-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #1a1a1a; }
+  .wifi-item:last-child { border-bottom: none; }
+  .wifi-name { font-size: 12px; color: #737373; }
+  .wifi-value { font-family: 'Courier New', monospace; font-size: 12px; color: #e5e5e5; background: #1a1a1a; padding: 3px 8px; border-radius: 4px; cursor: pointer; }
+  .wifi-pass { margin-top: 10px; padding: 10px 12px; background: #1a1a1a; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+  .wifi-pass-label { font-size: 11px; color: #525252; }
+  .wifi-pass-value { font-family: 'Courier New', monospace; font-size: 13px; color: #4ade80; cursor: pointer; }
+  .rule-item { padding: 5px 0; display: flex; gap: 8px; align-items: flex-start; }
+  .rule-emoji { font-size: 14px; flex-shrink: 0; }
+  .rule-text { font-size: 12px; color: #a3a3a3; line-height: 1.5; }
+  .copy-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #34d399; color: #0a0a0a; padding: 8px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100; }
+  .copy-toast.show { opacity: 1; }
 </style>
 </head>
 <body>
@@ -124,6 +146,7 @@
   <div class="brand">Defihaus</div>
   <div id="content"></div>
 </div>
+<div class="copy-toast" id="toast">Copiado</div>
 
 <script>
 // ============================================================
@@ -159,6 +182,66 @@ function renderActive(data) {
     </div>
     <div class="label" id="doorLabel" style="color:#e5e5e5">Toca para abrir</div>
     ${coDate ? `<div class="sublabel">Acceso hasta ${coDate}</div>` : ""}
+
+    <div class="info-section">
+
+      <!-- WiFi -->
+      <div class="info-card">
+        <div class="info-header" onclick="toggleCard(this)">
+          <div class="info-header-left">
+            <div class="info-icon">📶</div>
+            <div class="info-title">WiFi</div>
+          </div>
+          <div class="info-chevron">▼</div>
+        </div>
+        <div class="info-body">
+          <div class="wifi-item">
+            <span class="wifi-name">Red general</span>
+            <span class="wifi-value" onclick="copyText('Totalplay-D4B5-5G-EXT')">Totalplay-D4B5-5G-EXT</span>
+          </div>
+          <div class="wifi-item">
+            <span class="wifi-name">Recámara 1</span>
+            <span class="wifi-value" onclick="copyText('Totalplay-D4B5_EXT_2')">Totalplay-D4B5_EXT_2</span>
+          </div>
+          <div class="wifi-item">
+            <span class="wifi-name">Recámara 2</span>
+            <span class="wifi-value" onclick="copyText('Totalplay-D4B5')">Totalplay-D4B5</span>
+          </div>
+          <div class="wifi-pass">
+            <span class="wifi-pass-label">Contraseña (todas)</span>
+            <span class="wifi-pass-value" onclick="copyText('D4B55712gde5SmAq')">D4B55712gde5SmAq</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reglas -->
+      <div class="info-card">
+        <div class="info-header" onclick="toggleCard(this)">
+          <div class="info-header-left">
+            <div class="info-icon">📋</div>
+            <div class="info-title">Reglas de la casa</div>
+          </div>
+          <div class="info-chevron">▼</div>
+        </div>
+        <div class="info-body">
+          <div class="rule-item"><span class="rule-emoji">🚷</span><span class="rule-text">No está permitido el ingreso de visitas ni personas adicionales a las registradas.</span></div>
+          <div class="rule-item"><span class="rule-emoji">❌</span><span class="rule-text">No se permiten fiestas ni reuniones.</span></div>
+          <div class="rule-item"><span class="rule-emoji">🚫</span><span class="rule-text">Prohibido fumar o vapear dentro del alojamiento.</span></div>
+          <div class="rule-item"><span class="rule-emoji">🔇</span><span class="rule-text">Respeta los horarios de silencio.</span></div>
+          <div class="rule-item"><span class="rule-emoji">🍽️</span><span class="rule-text">Después de usar la cocina, lava y deja limpio todo lo que hayas utilizado.</span></div>
+          <div class="rule-item"><span class="rule-emoji">🧹</span><span class="rule-text">Mantén las áreas comunes limpias y ordenadas. No dejes ropa ni objetos personales en áreas comunes.</span></div>
+          <div class="rule-item"><span class="rule-emoji">♻️</span><span class="rule-text">La basura debe tirarse diariamente en el contenedor de la planta baja, justo debajo del apartamento.</span></div>
+          <div class="rule-item"><span class="rule-emoji">🔐</span><span class="rule-text">Asegúrate de cerrar bien puertas y ventanas al salir.</span></div>
+          <div class="rule-item"><span class="rule-emoji">🏡</span><span class="rule-text">Cuida nuestra casa como si fuera tuya. Evita dañar o romper cualquier objeto.</span></div>
+        </div>
+      </div>
+
+      <!-- Bienvenida -->
+      <div style="text-align:center;margin-top:16px;padding:12px;font-size:12px;color:#3a3a3a;line-height:1.6">
+        ✨ Agradecemos tu respeto y colaboración.<br>¡Te deseamos una estancia muy agradable!
+      </div>
+
+    </div>
   `;
 }
 
@@ -259,6 +342,21 @@ async function init() {
 }
 
 init();
+
+function toggleCard(header) {
+  const body = header.nextElementSibling;
+  const chevron = header.querySelector('.info-chevron');
+  body.classList.toggle('open');
+  chevron.classList.toggle('open');
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const toast = $("toast");
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 1500);
+  });
+}
 </script>
 </body>
 </html>
