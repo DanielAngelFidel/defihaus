@@ -108,11 +108,12 @@ try{
 
 function renderRes(r,type){
 const badge=type==="active"?'<span class="res-badge badge-active">ACTIVO</span>':'<span class="res-badge badge-upcoming">PRÓXIMO</span>';
+const listBadge=r.listing?'<span class="res-badge" style="background:'+(r.label==="room"?"#1e1b4b;color:#818cf8":"#2e1b0e;color:#fb923c")+'">'+r.listing+'</span>':"";
 const ci=new Date(r.checkIn).toLocaleDateString("es-MX",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
 const co=new Date(r.checkOut).toLocaleDateString("es-MX",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
 const msg=encodeURIComponent("¡Hola!\\n\\nTu PIN de acceso para abrir la puerta del edificio es:\\n\\n🔑 "+r.pin+"\\n\\nÚsalo en este link:\\n👉 navarte2.romanortehost.com\\n\\n¡Que disfrutes tu estancia!");
 return`<div class="reservation">
-<div class="res-header"><span class="res-guest">${r.guest}</span>${badge}</div>
+<div class="res-header"><span class="res-guest">${r.guest}</span><div>${listBadge} ${badge}</div></div>
 <div class="res-dates">📅 ${ci} → ${co}</div>
 <div class="res-pin">
   <div><div class="res-pin-label">PIN</div><div class="res-pin-value">${r.pin}</div></div>

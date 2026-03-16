@@ -1,5 +1,5 @@
 // ============================================================
-// CLOUDFLARE WORKER — Defihaus Puerta Narvarte v2 (PIN system)
+// CLOUDFLARE WORKER — Defihaus Puerta Narvarte v3 (Multi-listing)
 // ============================================================
 
 const CORS = {
@@ -62,9 +62,48 @@ function getReservations(events, ciHour, coHour) {
   return reservations;
 }
 
-function getActiveReservation(events, ciHour, coHour) {
-  const active = getReservations(events, ciHour, coHour).find(r => r.active);
-  return active ? { active: true, guest: active.guest, checkIn: active.checkIn, checkOut: active.checkOut, startDate: active.startDate, endDate: active.endDate } : { active: false };
+async function getAllListings(env) {
+  const listings = [
+    { name: "Habitación", label: "room", url: env.ICAL_URL },
+  ];
+  if (env.ICAL_URL_2) {
+    listings.push({ name: "Casa completa", label: "house", url: env.ICAL_URL_2 });
+  }
+  const results = [];
+  for (const listing of listings) {
+    try {
+      const ical = await (await fetch(listing.url, { cf: { cacheTtl: 900, cacheEverything: true } })).text();
+      const events = parseICal(ical);
+      results.push({ ...listing, events });
+    } catch (e) {
+      results.push({ ...listing, events: [] });
+    }
+  }
+  return results;
+}
+
+async function findActiveByPin(listings, ciHour, coHour, pin, secret) {
+  for (const listing of listings) {
+    const reservations = getReservations(listing.events, ciHour, coHour);
+    for (const r of reservations) {
+      if (r.active) {
+        const correctPin = await generatePin(r.startDate, r.endDate, secret);
+        if (pin === correctPin) {
+          return { found: true, guest: r.guest, checkOut: r.checkOut, listing: listing.name, label: listing.label };
+        }
+      }
+    }
+  }
+  return { found: false };
+}
+
+function anyActiveReservation(listings, ciHour, coHour) {
+  for (const listing of listings) {
+    const reservations = getReservations(listing.events, ciHour, coHour);
+    const active = reservations.find(r => r.active);
+    if (active) return { active: true, guest: active.guest, listing: listing.name };
+  }
+  return { active: false };
 }
 
 const rateMap = new Map();
@@ -95,15 +134,20 @@ export default {
         const pin = (body.pin || "").trim();
         if (!pin || pin.length !== 6)
           return new Response(JSON.stringify({ valid: false, error: "invalid_pin" }), { headers: CORS });
-        const ical = await (await fetch(env.ICAL_URL, { cf: { cacheTtl: 900, cacheEverything: true } })).text();
-        const events = parseICal(ical);
-        const active = getActiveReservation(events, ciHour, coHour);
-        if (!active.active)
-          return new Response(JSON.stringify({ valid: false, error: "no_reservation" }), { headers: CORS });
-        const correctPin = await generatePin(active.startDate, active.endDate, env.ACCESS_KEY);
-        if (pin !== correctPin)
+
+        const listings = await getAllListings(env);
+        const match = await findActiveByPin(listings, ciHour, coHour, pin, env.ACCESS_KEY);
+
+        if (match.found) {
+          return new Response(JSON.stringify({
+            valid: true, guest: match.guest, checkOut: match.checkOut,
+            listing: match.listing, label: match.label
+          }), { headers: CORS });
+        }
+        const any = anyActiveReservation(listings, ciHour, coHour);
+        if (any.active)
           return new Response(JSON.stringify({ valid: false, error: "wrong_pin" }), { headers: CORS });
-        return new Response(JSON.stringify({ valid: true, guest: active.guest, checkOut: active.checkOut }), { headers: CORS });
+        return new Response(JSON.stringify({ valid: false, error: "no_reservation" }), { headers: CORS });
       }
 
       // ---- OPEN DOOR ----
@@ -114,62 +158,71 @@ export default {
         const body = await req.json().catch(() => ({}));
         const pin = (body.pin || "").trim();
         let authorized = false;
-        if (body.key === env.ACCESS_KEY) { authorized = true; }
-        else if (pin && pin.length === 6) {
-          const ical2 = await (await fetch(env.ICAL_URL, { cf: { cacheTtl: 900, cacheEverything: true } })).text();
-          const ev2 = parseICal(ical2);
-          const act2 = getActiveReservation(ev2, ciHour, coHour);
-          if (act2.active) {
-            const cp = await generatePin(act2.startDate, act2.endDate, env.ACCESS_KEY);
-            if (pin === cp) authorized = true;
+        let guestName = "Admin";
+        let listingName = "";
+
+        if (body.key === env.ACCESS_KEY) {
+          authorized = true;
+        } else if (pin && pin.length === 6) {
+          const listings = await getAllListings(env);
+          const match = await findActiveByPin(listings, ciHour, coHour, pin, env.ACCESS_KEY);
+          if (match.found) {
+            authorized = true;
+            guestName = match.guest;
+            listingName = match.listing;
           }
         }
         if (!authorized)
           return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: CORS });
-        const ical = await (await fetch(env.ICAL_URL, { cf: { cacheTtl: 900, cacheEverything: true } })).text();
-        const events = parseICal(ical);
-        const status = getActiveReservation(events, ciHour, coHour);
-        if (!status.active)
-          return new Response(JSON.stringify({ error: "no_reservation" }), { status: 403, headers: CORS });
+
         const res = await fetch("https://" + env.SHELLY_SERVER + "/device/relay/control", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
           body: new URLSearchParams({ auth_key: env.SHELLY_AUTH_KEY, id: env.SHELLY_DEVICE_ID, channel: "0", turn: "on" }),
         });
-        // Send push notification if configured
         if (res.ok && env.NTFY_TOPIC) {
           const now = new Date().toLocaleString("es-MX", { timeZone: "America/Mexico_City" });
+          const info = listingName ? ` (${listingName})` : "";
           fetch("https://ntfy.sh/" + env.NTFY_TOPIC, {
             method: "POST",
             headers: { "Title": "Puerta abierta - Narvarte", "Tags": "door,key" },
-            body: (status.guest || "Huésped") + " abrió la puerta\n" + now,
+            body: (guestName || "Huésped") + info + " abrió la puerta\n" + now,
           }).catch(() => {});
         }
         return new Response(JSON.stringify({ success: res.ok }), { status: res.ok ? 200 : 500, headers: CORS });
       }
 
-      // ---- ADMIN: list PINs ----
+      // ---- ADMIN: list PINs (all listings) ----
       if (path === "/api/admin/pins" && req.method === "GET") {
         if (url.searchParams.get("key") !== env.ACCESS_KEY)
           return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: CORS });
-        const ical = await (await fetch(env.ICAL_URL, { cf: { cacheTtl: 900, cacheEverything: true } })).text();
-        const events = parseICal(ical);
-        const reservations = getReservations(events, ciHour, coHour);
-        const withPins = [];
-        for (const r of reservations) {
-          withPins.push({ guest: r.guest, checkIn: r.checkIn, checkOut: r.checkOut, active: r.active, pin: await generatePin(r.startDate, r.endDate, env.ACCESS_KEY) });
+        const listings = await getAllListings(env);
+        const allReservations = [];
+        for (const listing of listings) {
+          const reservations = getReservations(listing.events, ciHour, coHour);
+          for (const r of reservations) {
+            allReservations.push({
+              guest: r.guest, checkIn: r.checkIn, checkOut: r.checkOut,
+              active: r.active, listing: listing.name, label: listing.label,
+              pin: await generatePin(r.startDate, r.endDate, env.ACCESS_KEY),
+            });
+          }
         }
-        return new Response(JSON.stringify({ reservations: withPins }), { headers: CORS });
+        allReservations.sort((a, b) => {
+          if (a.active && !b.active) return -1;
+          if (!a.active && b.active) return 1;
+          return new Date(a.checkIn) - new Date(b.checkIn);
+        });
+        return new Response(JSON.stringify({ reservations: allReservations }), { headers: CORS });
       }
 
-      // ---- STATUS (legacy) ----
+      // ---- STATUS ----
       if (path === "/api/status" && req.method === "GET") {
         if (url.searchParams.get("key") !== env.ACCESS_KEY)
           return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: CORS });
-        const ical = await (await fetch(env.ICAL_URL, { cf: { cacheTtl: 900, cacheEverything: true } })).text();
-        const events = parseICal(ical);
-        const status = getActiveReservation(events, ciHour, coHour);
-        return new Response(JSON.stringify(status), { headers: CORS });
+        const listings = await getAllListings(env);
+        const any = anyActiveReservation(listings, ciHour, coHour);
+        return new Response(JSON.stringify(any), { headers: CORS });
       }
 
       return new Response("Not found", { status: 404 });
