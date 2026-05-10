@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { access } from "node:fs/promises";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
@@ -16,6 +17,10 @@ test("habitacion dos guide reserves room-specific image paths for room two asset
   assert.match(roomTwoGuide, /src="\/arrival\/habitacion-dos\/08-hallway\.jpg\?v=[0-9-]+"/);
   assert.doesNotMatch(roomTwoGuide, /src="\/arrival\/habitacion-uno\/07-room\.jpg/);
   assert.doesNotMatch(roomTwoGuide, /src="\/arrival\/habitacion-uno\/08-hallway\.jpg/);
+});
+
+test("habitacion dos guide has the room photo asset", async () => {
+  await access(new URL("../arrival/habitacion-dos/07-room.jpg", import.meta.url));
 });
 
 test("admin maps habitacion dos listings to the habitacion dos guide", () => {
