@@ -169,6 +169,7 @@ const L={
   verifying:isEn?"Verifying...":"Verificando...",
   wrongPin:isEn?"Incorrect PIN":"PIN incorrecto",
   noRes:isEn?"No active reservation right now":"No hay reserva activa en este momento",
+  earlyAccess:isEn?"Your PIN is correct, but access starts at 4:00 PM Mexico City time. Please wait until check-in time.":"Tu PIN es correcto, pero el acceso se activa a las 4:00 p.m. hora de México. Por favor espera hasta tu hora de check-in.",
   errGeneric:isEn?"Error, try again":"Error, intenta de nuevo",
   errConn:isEn?"Connection error":"Error de conexión",
   welcome:isEn?"Welcome to Narvarte":"Bienvenido a Narvarte",
@@ -178,7 +179,7 @@ const L={
   errRetry:isEn?"Error — try again":"Error — intenta de nuevo",
   waitMoment:isEn?"Wait a moment":"Espera un momento",
   accessUntil:isEn?"Access until":"Acceso hasta",
-  checkinTime:isEn?"Check-in: 3:00 PM":"Check-in: 3:00 PM",
+  checkinTime:isEn?"Check-in: 4:00 PM":"Check-in: 4:00 PM",
   checkoutTime:isEn?"Check-out: 11:00 AM":"Check-out: 11:00 AM",
   guideTitle:isEn?"Narvarte Guide":"Guía de Narvarte",
   guideSub:isEn?"Best spots in the neighborhood, picked by locals":"Los mejores spots del barrio, seleccionados por locales",
@@ -294,6 +295,7 @@ async function verifyPin(){$("pinBtn").disabled=true;$("pinBtn").textContent=L.v
 try{const r=await fetch(WORKER_URL+"/api/verify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pin:currentPin})});const d=await r.json();
 if(d.valid){savePin(currentPin);renderActive(d,currentPin)}
 else if(d.error==="wrong_pin"){$("pinError").textContent=L.wrongPin;document.querySelectorAll(".pin-digit").forEach(x=>{x.classList.add("err");x.value=""});document.querySelector(".pin-digit").focus();$("pinBtn").textContent=L.verify}
+else if(d.error==="early_access"){$("pinError").textContent=L.earlyAccess;$("pinBtn").textContent=L.verify}
 else if(d.error==="no_reservation"){$("pinError").textContent=L.noRes;$("pinBtn").textContent=L.verify}
 else{$("pinError").textContent=L.errGeneric;$("pinBtn").textContent=L.verify}
 }catch(e){$("pinError").textContent=L.errConn;$("pinBtn").textContent=L.verify}}
@@ -461,7 +463,7 @@ c.innerHTML=ic[s]||ic.idle;l.textContent=lb[s]?lb[s].t:"";l.style.color=lb[s]?lb
 async function openDoor(){if(doorState!=="idle")return;updDoor("opening");
 try{const r=await fetch(WORKER_URL+"/api/open",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pin:currentPin})});
 if(r.status===429){updDoor("rate");setTimeout(()=>updDoor("idle"),5000);return}
-const d=await r.json();if(d.success){updDoor("success");setTimeout(()=>updDoor("idle"),4000)}else{updDoor("error");setTimeout(()=>updDoor("idle"),3000)}}
+const d=await r.json();if(d.success){updDoor("success");setTimeout(()=>updDoor("idle"),4000)}else{updDoor("error");if(d.error==="early_access"){const l=$("doorLabel");if(l)l.textContent=L.earlyAccess}setTimeout(()=>updDoor("idle"),3000)}}
 catch(e){updDoor("error");setTimeout(()=>updDoor("idle"),3000)}}
 
 function tog(h){h.nextElementSibling.classList.toggle("open");h.querySelector(".chev").classList.toggle("open")}

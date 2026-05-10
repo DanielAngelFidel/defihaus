@@ -173,7 +173,8 @@ async function verifyPin(){
       openBtn.hidden=false;
       return;
     }
-    if(data.error==="no_reservation") status.textContent="El acceso todavía no está disponible.";
+    if(data.error==="early_access") status.textContent="Tu PIN es correcto, pero el acceso se activa a las 4:00 p.m. hora de México. Por favor espera hasta tu hora de check-in.";
+    else if(data.error==="no_reservation") status.textContent="El acceso todavía no está disponible. Recuerda que el check-in es a partir de las 4:00 p.m. hora de México.";
     else status.textContent="PIN incorrecto. Revisa que sea el PIN del mensaje actual de Airbnb.";
   }catch(e){
     status.textContent="Error de conexión. Inténtalo de nuevo.";
@@ -202,7 +203,8 @@ async function openDoor(){
       setTimeout(()=>{btn.disabled=false;btn.textContent="Abrir puerta"},4500);
       return;
     }
-    if(res.status===401) status.textContent="PIN no autorizado o fuera del horario de acceso.";
+    if(data.error==="early_access") status.textContent="Tu PIN es correcto, pero el acceso se activa a las 4:00 p.m. hora de México. Por favor espera hasta tu hora de check-in.";
+    else if(res.status===401) status.textContent="PIN no autorizado o fuera del horario de acceso.";
     else if(res.status===429) status.textContent="Espera un momento e inténtalo de nuevo.";
     else status.textContent="No se pudo abrir. Inténtalo de nuevo.";
   }catch(e){

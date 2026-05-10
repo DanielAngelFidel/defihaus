@@ -99,15 +99,27 @@ async function getAllListings(env) {
   return results;
 }
 
-async function findActiveByPin(listings, ciHour, coHour, pin, secret) {
+function mexicoNow() {
+  return new Date(new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" }));
+}
+
+async function findReservationByPin(listings, ciHour, coHour, pin, secret) {
+  const now = mexicoNow();
   for (const listing of listings) {
     const reservations = getReservations(listing.events, ciHour, coHour);
     for (const r of reservations) {
-      if (r.active) {
-        const correctPin = await generatePin(r.startDate, r.endDate, secret);
-        if (pin === correctPin) {
-          return { found: true, guest: r.guest, checkOut: r.checkOut, listing: listing.name, label: listing.label };
-        }
+      const correctPin = await generatePin(r.startDate, r.endDate, secret);
+      if (pin === correctPin) {
+        return {
+          found: true,
+          active: r.active,
+          early: now < new Date(r.checkIn),
+          guest: r.guest,
+          checkIn: r.checkIn,
+          checkOut: r.checkOut,
+          listing: listing.name,
+          label: listing.label,
+        };
       }
     }
   }
@@ -164,11 +176,17 @@ export default {
           return new Response(JSON.stringify({ valid: false, error: "invalid_pin" }), { headers: CORS });
 
         const listings = await getAllListings(env);
-        const match = await findActiveByPin(listings, ciHour, coHour, pin, env.ACCESS_KEY);
+        const match = await findReservationByPin(listings, ciHour, coHour, pin, env.ACCESS_KEY);
 
-        if (match.found) {
+        if (match.found && match.active) {
           return new Response(JSON.stringify({
             valid: true, guest: match.guest, checkOut: match.checkOut,
+            listing: match.listing, label: match.label
+          }), { headers: CORS });
+        }
+        if (match.found && match.early) {
+          return new Response(JSON.stringify({
+            valid: false, error: "early_access", checkIn: match.checkIn,
             listing: match.listing, label: match.label
           }), { headers: CORS });
         }
@@ -188,20 +206,23 @@ export default {
         let authorized = false;
         let guestName = "Admin";
         let listingName = "";
+        let denial = null;
 
         if (isAdminAuthorized(req, url, env) || body.key === env.ACCESS_KEY) {
           authorized = true;
         } else if (pin && pin.length === 6) {
           const listings = await getAllListings(env);
-          const match = await findActiveByPin(listings, ciHour, coHour, pin, env.ACCESS_KEY);
-          if (match.found) {
+          const match = await findReservationByPin(listings, ciHour, coHour, pin, env.ACCESS_KEY);
+          if (match.found && match.active) {
             authorized = true;
             guestName = match.guest;
             listingName = match.listing;
+          } else if (match.found && match.early) {
+            denial = { error: "early_access", checkIn: match.checkIn, listing: match.listing, label: match.label };
           }
         }
         if (!authorized)
-          return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: CORS });
+          return new Response(JSON.stringify(denial || { error: "unauthorized" }), { status: 401, headers: CORS });
 
         const res = await fetch("https://" + env.SHELLY_SERVER + "/device/relay/control", {
           method: "POST",
