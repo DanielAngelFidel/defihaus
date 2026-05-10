@@ -88,10 +88,15 @@ test("admin copies the updated habitacion dos Airbnb message with visual guide",
   const api = loadAdminApi();
   const message = api.airbnbMessage("211610", "habitacion dos");
 
-  assert.match(message, /^Hola 😊/);
-  assert.match(message, /Aquí tienes tu guía de check-in, ya con tu PIN cargado:/);
+  assert.match(message, /^Hola,/);
+  assert.match(message, /¡Bienvenido! Nos da mucho gusto recibirte y esperamos que disfrutes muchísimo tu estancia\./);
+  assert.match(message, /Para que tu llegada sea muy fácil, te compartimos la guía para hacer tu check-in:/);
   assert.match(message, /https:\/\/navarte2\.romanortehost\.com\/checkin-habitacion-dos\.html\?pin=211610/);
-  assert.match(message, /Tu PIN de acceso es: 211610/);
-  assert.match(message, /Al llegar, busca la entrada que dice 26B\./);
+  assert.match(message, /También te dejamos la guía de la estancia, donde encontrarás información útil sobre el alojamiento:\nhttps:\/\/navarte2\.romanortehost\.com/);
+  assert.match(message, /Tu PIN de acceso es:\n211610/);
+  assert.match(message, /El link de check-in ya lleva tu PIN cargado\./);
+  assert.match(message, /¡Que tengas una estancia muy agradable!/);
+  assert.doesNotMatch(message, /Hola 😊/);
+  assert.doesNotMatch(message, /La dirección correcta/);
   assert.doesNotMatch(message, /Para que tu llegada sea muy fácil, te compartimos tu acceso digital/);
 });
