@@ -21,13 +21,21 @@ test("employee access page is a single mobile entry point to the admin panel", (
   assert.match(equipo, /<h1>Defihaus Equipo<\/h1>/);
   assert.match(equipo, /href="admin\.html"/);
   assert.match(equipo, />Entrar al panel<\/a>/);
+  assert.match(equipo, /No necesitas instalar nada/);
 });
 
-test("employee access page explains home screen installation without exposing secrets", () => {
-  assert.match(equipo, /Agregar a pantalla de inicio/);
+test("employee access page makes home screen installation optional without exposing secrets", () => {
+  assert.match(equipo, /Icono opcional/);
   assert.match(equipo, /iPhone/);
   assert.match(equipo, /Android/);
   assert.doesNotMatch(equipo, /ACCESS_KEY|SHELLY_AUTH_KEY|GITHUB_TOKEN|dh-narv-2026|acapulco2024/);
+});
+
+test("employee access page includes a WhatsApp group pinned message", () => {
+  assert.match(equipo, /Mensaje para fijar en WhatsApp/);
+  assert.match(equipo, /Panel Defihaus/);
+  assert.match(equipo, /https:\/\/navarte2\.romanortehost\.com\/equipo/);
+  assert.match(equipo, /copyGroupMessage/);
 });
 
 test("employee access page has an installable staff manifest", () => {

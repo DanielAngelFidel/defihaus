@@ -26,10 +26,11 @@ h1{font-size:22px;font-weight:700;margin-bottom:24px}
 .res-pin-label{font-size:11px;color:#525252}
 .res-pin-value{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#fbbf24;letter-spacing:4px}
 .res-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-.res-actions button{width:100%;padding:12px 10px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.res-actions button,.res-actions a{width:100%;padding:12px 10px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;display:block}
 .copy-pin-action{background:#3b2f13;color:#fbbf24}
 .message-action{background:#262626;color:#d4d4d4}
-.res-actions button:hover{filter:brightness(1.12)}
+.res-actions button:hover,.res-actions a:hover{filter:brightness(1.12)}
+.guide-action{background:#10251a;color:#4ade80}
 .section-title{font-size:11px;color:#525252;text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px}
 .open-btn{width:100%;padding:14px;background:#1a3a2a;border:1px solid #22c55e;border-radius:10px;color:#4ade80;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:20px;font-family:inherit}
 .log{background:#141414;border:1px solid #1f1f1f;border-radius:8px;padding:10px 14px;margin-bottom:6px;font-size:12px;color:#737373;display:flex;justify-content:space-between}
@@ -173,6 +174,8 @@ const co=new Date(r.checkOut).toLocaleDateString("es-MX",{weekday:"short",day:"n
 const guestArg=JSON.stringify(r.guest||"");
 const pinArg=JSON.stringify(r.pin||"");
 const listingArg=JSON.stringify(r.listing||"");
+const guideUrl=guideUrlWithPin(r.listing||"",r.pin||"");
+const messageLabel=guideUrl?"Copiar mensaje Airbnb + guía visual":"Copiar mensaje";
 const guestName=(r.guest||"").toLowerCase()==="reserved"?"Reserva Airbnb":r.guest;
 return`<div class="reservation">
 <div class="res-header"><span class="res-guest">${guestName}</span><div>${listBadge} ${badge}</div></div>
@@ -183,7 +186,8 @@ return`<div class="reservation">
 </div>
 <div class="res-actions">
   <button class="copy-pin-action" onclick='cp(${pinArg})'>Copiar PIN</button>
-  <button class="message-action" onclick='cpMsg(${guestArg},${pinArg},${listingArg})'>Copiar mensaje</button>
+  <button class="message-action" onclick='cpMsg(${guestArg},${pinArg},${listingArg})'>${messageLabel}</button>
+  ${guideUrl?`<a class="guide-action" href="${guideUrl}" target="_blank" rel="noopener">Ver guía visual</a>`:""}
 </div>
 </div>`;
 }
@@ -276,26 +280,16 @@ function airbnbMessage(pin,listing){
 const baseGuideUrl=guideUrlWithPin(listing,pin);
 if(!baseGuideUrl) return generalAirbnbMessage(pin,listing);
 const guideUrl=baseGuideUrl;
-return`Hola,
+return`Hola 😊
 
-¡Bienvenido! Nos da mucho gusto recibirte y esperamos que disfrutes muchísimo tu estancia.
-
-Dirección correcta:
-Xochicalco 26, Narvarte Poniente, Benito Juárez, 03000 Ciudad de México.
-La entrada debe decir 26B.
-
-Para que tu llegada sea muy fácil, te compartimos la guía para hacer tu check-in:
+Aquí tienes tu guía de check-in, ya con tu PIN cargado:
 ${guideUrl}
 
-También te dejamos la guía de la estancia, donde encontrarás información útil sobre el alojamiento:
-${ACCESS_URL}
+Tu PIN de acceso es: ${pin}
 
-Tu PIN de acceso es:
-${pin}
+Al llegar, busca la entrada que dice 26B.
 
-El link de check-in ya lleva tu PIN cargado. Si necesitas copiarlo, dentro de la guía verás un icono junto al código.
-
-Si Airbnb o Maps te muestran otra ubicación, usa la dirección de este mensaje.
+En la guía también encontrarás la dirección correcta, las fotos de llegada y el botón para abrir la puerta.
 
 Cualquier duda antes o durante tu llegada, escríbenos por aquí con toda confianza. Estamos pendientes para ayudarte.
 
@@ -307,14 +301,11 @@ const baseGuideUrl=guideUrlWithPin(listing,pin);
 if(!baseGuideUrl) return generalAirbnbHtmlMessage(pin,listing);
 const guideUrl=baseGuideUrl;
 return`<div>
-  <p>Hola,</p>
-  <p>¡Bienvenido! Nos da mucho gusto recibirte y esperamos que disfrutes muchísimo tu estancia.</p>
-  <p><strong>Dirección correcta:</strong><br>Xochicalco 26, Narvarte Poniente, Benito Juárez, 03000 Ciudad de México.<br>La entrada debe decir <strong>26B</strong>.</p>
-  <p>Para que tu llegada sea muy fácil, te compartimos la guía para hacer tu check-in:<br><a href="${guideUrl}">${guideUrl}</a></p>
-  <p>También te dejamos la guía de la estancia, donde encontrarás información útil sobre el alojamiento:<br><a href="${ACCESS_URL}">${ACCESS_URL}</a></p>
-  <p><strong>Tu PIN de acceso es:</strong><br><span style="font-size:22px;font-weight:700;letter-spacing:3px">${pin}</span></p>
-  <p>El link de check-in ya lleva tu PIN cargado. Si necesitas copiarlo, dentro de la guía verás un icono junto al código.</p>
-  <p>Si Airbnb o Maps te muestran otra ubicación, usa la dirección de este mensaje.</p>
+  <p>Hola 😊</p>
+  <p>Aquí tienes tu guía de check-in, ya con tu PIN cargado:<br><a href="${guideUrl}">${guideUrl}</a></p>
+  <p><strong>Tu PIN de acceso es:</strong> <span style="font-size:22px;font-weight:700;letter-spacing:3px">${pin}</span></p>
+  <p>Al llegar, busca la entrada que dice <strong>26B</strong>.</p>
+  <p>En la guía también encontrarás la dirección correcta, las fotos de llegada y el botón para abrir la puerta.</p>
   <p>Cualquier duda antes o durante tu llegada, escríbenos por aquí con toda confianza. Estamos pendientes para ayudarte.</p>
   <p>¡Que tengas una estancia muy agradable!</p>
 </div>`;
