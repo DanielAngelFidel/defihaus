@@ -48,6 +48,7 @@ h1{font-size:22px;font-weight:700;margin-bottom:24px}
 const WORKER="https://puerta-narvarte.danielangelfidel.workers.dev";
 const ACCESS_URL="https://navarte2.romanortehost.com";
 const ROOM_ONE_GUIDE_URL=ACCESS_URL+"/checkin-habitacion-uno.html";
+const HOUSE_GUIDE_URL=ACCESS_URL+"/checkin-casa-completa.html";
 const ARRIVAL_STEPS=[
   {
     image:"",
@@ -171,7 +172,7 @@ const co=new Date(r.checkOut).toLocaleDateString("es-MX",{weekday:"short",day:"n
 const guestArg=JSON.stringify(r.guest||"");
 const pinArg=JSON.stringify(r.pin||"");
 const listingArg=JSON.stringify(r.listing||"");
-const guideUrl=isRoomWithPrivateBath(r.listing)?ROOM_ONE_GUIDE_URL:"";
+const guideUrl=guideUrlForListing(r.listing);
 return`<div class="reservation">
 <div class="res-header"><span class="res-guest">${r.guest}</span><div>${listBadge} ${badge}</div></div>
 <div class="res-dates">📅 ${ci} → ${co}</div>
@@ -210,6 +211,16 @@ function isRoomWithPrivateBath(listing){
   return (listing||"").toLowerCase().includes("aseo dentro");
 }
 
+function isFullHouse(listing){
+  return (listing||"").toLowerCase().includes("casa completa");
+}
+
+function guideUrlForListing(listing){
+  if(isRoomWithPrivateBath(listing)) return ROOM_ONE_GUIDE_URL;
+  if(isFullHouse(listing)) return HOUSE_GUIDE_URL;
+  return "";
+}
+
 function generalAirbnbMessage(pin,listing){
 const listingLine=listing?`\nAlojamiento: ${listing}\n`:"";
 return`Hola,
@@ -243,9 +254,14 @@ return`<div>
 }
 
 function airbnbMessage(pin,listing){
-if(!isRoomWithPrivateBath(listing)) return generalAirbnbMessage(pin,listing);
-const guideUrl=ROOM_ONE_GUIDE_URL+"?pin="+encodeURIComponent(pin);
+const baseGuideUrl=guideUrlForListing(listing);
+if(!baseGuideUrl) return generalAirbnbMessage(pin,listing);
+const guideUrl=baseGuideUrl;
 return`Hola,
+
+Dirección correcta:
+Xochicalco 26, Narvarte Poniente, Benito Juárez, 03000 Ciudad de México.
+La entrada debe decir 26B.
 
 Esta es la guía para hacer el check-in:
 ${guideUrl}
@@ -256,17 +272,22 @@ ${ACCESS_URL}
 Tu PIN de acceso es:
 ${pin}
 
+Introduce este PIN dentro de la guía de check-in. Si Airbnb o Maps te muestran otra ubicación, usa la dirección de este mensaje.
+
 Esperamos que tengas una muy buena estancia. Si tienes cualquier duda durante tu llegada, escríbenos por aquí y te ayudamos.`;
 }
 
 function airbnbHtmlMessage(pin,listing){
-if(!isRoomWithPrivateBath(listing)) return generalAirbnbHtmlMessage(pin,listing);
-const guideUrl=ROOM_ONE_GUIDE_URL+"?pin="+encodeURIComponent(pin);
+const baseGuideUrl=guideUrlForListing(listing);
+if(!baseGuideUrl) return generalAirbnbHtmlMessage(pin,listing);
+const guideUrl=baseGuideUrl;
 return`<div>
   <p>Hola,</p>
+  <p><strong>Dirección correcta:</strong><br>Xochicalco 26, Narvarte Poniente, Benito Juárez, 03000 Ciudad de México.<br>La entrada debe decir <strong>26B</strong>.</p>
   <p>Esta es la guía para hacer el check-in:<br><a href="${guideUrl}">${guideUrl}</a></p>
   <p>Esta es la guía para tu estancia:<br><a href="${ACCESS_URL}">${ACCESS_URL}</a></p>
   <p><strong>Tu PIN de acceso es:</strong><br><span style="font-size:22px;font-weight:700;letter-spacing:3px">${pin}</span></p>
+  <p>Introduce este PIN dentro de la guía de check-in. Si Airbnb o Maps te muestran otra ubicación, usa la dirección de este mensaje.</p>
   <p>Esperamos que tengas una muy buena estancia. Si tienes cualquier duda durante tu llegada, escríbenos por aquí y te ayudamos.</p>
 </div>`;
 }
