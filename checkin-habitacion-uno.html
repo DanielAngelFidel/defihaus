@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía de llegada - Defihaus Narvarte</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f5f5f4;color:#1c1917;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;line-height:1.45}
+.wrap{max-width:560px;margin:0 auto;padding:24px 18px 48px}
+.brand{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:#78716c;font-weight:700;margin-bottom:8px}
+h1{font-size:28px;line-height:1.05;margin:0 0 10px;font-weight:800}
+.intro{font-size:15px;color:#57534e;margin:0 0 22px}
+.card{background:#fff;border:1px solid #e7e5e4;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.step{display:flex;gap:12px;align-items:flex-start}
+.num{width:28px;height:28px;border-radius:50%;background:#1c1917;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex:0 0 auto}
+.text{font-size:14px;color:#292524}
+.text strong{font-weight:800}
+.photo{width:100%;border-radius:8px;margin:12px 0 0;border:1px solid #e7e5e4;display:block}
+.photo[hidden]{display:none}
+.access{background:#1c1917;color:#fff;border-radius:10px;padding:14px;margin-top:12px}
+.access-label{font-size:12px;color:#d6d3d1;margin-bottom:10px}
+.pin-row{display:grid;grid-template-columns:1fr auto;gap:8px}
+.pin-input{width:100%;border:1px solid #57534e;border-radius:8px;background:#0c0a09;color:#fff;font-size:20px;font-weight:800;letter-spacing:4px;padding:12px;text-align:center;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;outline:none}
+.verify-btn,.open-btn{border:0;border-radius:8px;background:#fff;color:#1c1917;font-weight:800;font-size:14px;padding:12px 14px;cursor:pointer}
+.open-btn{width:100%;margin-top:10px}
+.verify-btn:disabled,.open-btn:disabled{opacity:.58;cursor:default}
+.open-btn[hidden]{display:none}
+.open-status{font-size:13px;color:#d6d3d1;margin-top:10px;min-height:18px}
+.muted{font-size:12px;color:#78716c;margin-top:18px}
+a{color:#1c1917;font-weight:700}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="brand">Defihaus Narvarte</div>
+  <h1>Guía de llegada</h1>
+  <p class="intro">Sigue estos pasos cuando llegues al edificio. El check-in es a partir de las 4:00 p.m.</p>
+
+  <div class="card">
+    <div class="step"><div class="num">1</div><div class="text">Asegúrate de estar en la dirección correcta: la entrada marcada con el <strong>número 26B</strong>.</div></div>
+    <img class="photo" src="/arrival/habitacion-uno/01-entrance.jpg?v=20260510-3" alt="Entrada del edificio 26B" onerror="this.hidden=true">
+  </div>
+
+  <div class="card">
+    <div class="step"><div class="num">2</div><div class="text">Introduce aquí tu PIN de acceso. Si el PIN es correcto, aparecerá el botón para abrir la puerta. El acceso solo estará disponible a partir de las 4:00 p.m. hora de México.</div></div>
+    <div class="access">
+      <div class="access-label">PIN de acceso</div>
+      <div class="pin-row">
+        <input class="pin-input" id="pinInput" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code">
+        <button class="verify-btn" id="verifyBtn" onclick="verifyPin()">Validar</button>
+      </div>
+      <button class="open-btn" id="openBtn" onclick="openDoor()" hidden>Abrir puerta</button>
+      <div class="open-status" id="openStatus"></div>
+    </div>
+    <img class="photo" src="/arrival/habitacion-uno/02-access-link.jpg?v=20260510-3" alt="Instrucciones de acceso digital" onerror="this.hidden=true">
+  </div>
+
+  <div class="card">
+    <div class="step"><div class="num">3</div><div class="text">Cuando suene, empuja la puerta para entrar al edificio.</div></div>
+    <img class="photo" src="/arrival/habitacion-uno/03-building-door.jpg?v=20260510-3" alt="Puerta del edificio" onerror="this.hidden=true">
+  </div>
+
+  <div class="card">
+    <div class="step"><div class="num">4</div><div class="text">Sube las escaleras que están frente a ti. Nuestro departamento queda del lado derecho.</div></div>
+    <img class="photo" src="/arrival/habitacion-uno/04-stairs.jpg?v=20260510-3" alt="Escaleras hacia el departamento" onerror="this.hidden=true">
+  </div>
+
+  <div class="card">
+    <div class="step"><div class="num">5</div><div class="text">Las llaves del departamento están dentro de la caja de seguridad en la puerta. El código es <strong>0000</strong>; desliza la palanca hacia abajo para abrirla.</div></div>
+    <img class="photo" src="/arrival/habitacion-uno/05-lockbox.jpg?v=20260510-3" alt="Caja de seguridad en la puerta del departamento" onerror="this.hidden=true">
+  </div>
+
+  <div class="card">
+    <div class="step"><div class="num">6</div><div class="text">La llave de color es para el departamento. La llave cuadrada es para el edificio. La tercera llave es para tu habitación.</div></div>
+    <img class="photo" src="/arrival/habitacion-uno/06-keys.jpg?v=20260510-3" alt="Llaves" onerror="this.hidden=true">
+  </div>
+
+  <div class="card">
+    <div class="step"><div class="num">7</div><div class="text">Tu habitación es la <strong>#1</strong>. Tu bote de basura está en la cocina y también está marcado con el <strong>#1</strong>. Este es un espacio compartido, así que te pedimos respetar las reglas de convivencia durante tu estancia.</div></div>
+    <img class="photo" src="/arrival/habitacion-uno/07-room.jpg?v=20260510-3" alt="Habitación uno" onerror="this.hidden=true">
+  </div>
+
+  <div class="card">
+    <div class="step"><div class="num">8</div><div class="text">Tu habitación está a la derecha al entrar al departamento, junto a la cocina.</div></div>
+    <img class="photo" src="/arrival/habitacion-uno/08-hallway.jpg?v=20260510-3" alt="Pasillo hacia la habitación uno" onerror="this.hidden=true">
+  </div>
+
+  <p class="muted">Si tienes cualquier duda durante tu llegada, escríbenos por Airbnb y te ayudamos.</p>
+</main>
+<script>
+const WORKER_URL="https://puerta-narvarte.danielangelfidel.workers.dev";
+let validPin="";
+const pinInput=document.getElementById("pinInput");
+const verifyBtn=document.getElementById("verifyBtn");
+const openBtn=document.getElementById("openBtn");
+const status=document.getElementById("openStatus");
+pinInput.addEventListener("input",()=>{
+  pinInput.value=pinInput.value.replace(/[^0-9]/g,"").slice(0,6);
+  validPin="";
+  openBtn.hidden=true;
+  status.textContent="";
+});
+pinInput.addEventListener("keydown",e=>{if(e.key==="Enter")verifyPin()});
+
+async function verifyPin(){
+  const pin=pinInput.value.trim();
+  if(pin.length!==6){status.textContent="Introduce los 6 dígitos del PIN.";return}
+  verifyBtn.disabled=true;
+  verifyBtn.textContent="Validando...";
+  status.textContent="";
+  openBtn.hidden=true;
+  validPin="";
+  try{
+    const res=await fetch(WORKER_URL+"/api/verify",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({pin})
+    });
+    const data=await res.json().catch(()=>({}));
+    if(res.ok&&data.valid){
+      validPin=pin;
+      status.textContent="PIN correcto. Ya puedes abrir la puerta.";
+      openBtn.hidden=false;
+      return;
+    }
+    if(data.error==="no_reservation") status.textContent="El acceso todavía no está disponible.";
+    else status.textContent="PIN incorrecto o fuera del horario de acceso.";
+  }catch(e){
+    status.textContent="Error de conexión. Inténtalo de nuevo.";
+  }finally{
+    verifyBtn.disabled=false;
+    verifyBtn.textContent="Validar";
+  }
+}
+
+async function openDoor(){
+  if(!validPin){status.textContent="Primero valida tu PIN.";return}
+  const btn=openBtn;
+  btn.disabled=true;
+  btn.textContent="Abriendo...";
+  status.textContent="";
+  try{
+    const res=await fetch(WORKER_URL+"/api/open",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({pin:validPin})
+    });
+    const data=await res.json().catch(()=>({}));
+    if(res.ok&&data.success){
+      btn.textContent="Puerta abierta";
+      status.textContent="Empuja la puerta para entrar.";
+      setTimeout(()=>{btn.disabled=false;btn.textContent="Abrir puerta"},4500);
+      return;
+    }
+    if(res.status===401) status.textContent="PIN no autorizado o fuera del horario de acceso.";
+    else if(res.status===429) status.textContent="Espera un momento e inténtalo de nuevo.";
+    else status.textContent="No se pudo abrir. Inténtalo de nuevo.";
+  }catch(e){
+    status.textContent="Error de conexión. Inténtalo de nuevo.";
+  }
+  btn.disabled=false;
+  btn.textContent="Abrir puerta";
+}
+</script>
+</body>
+</html>

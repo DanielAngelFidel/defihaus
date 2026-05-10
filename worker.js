@@ -5,7 +5,7 @@
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
   "Content-Type": "application/json",
 };
 
@@ -62,13 +62,30 @@ function getReservations(events, ciHour, coHour) {
   return reservations;
 }
 
-async function getAllListings(env) {
-  const listings = [
-    { name: "Habitación", label: "room", url: env.ICAL_URL },
-  ];
-  if (env.ICAL_URL_2) {
-    listings.push({ name: "Casa completa", label: "house", url: env.ICAL_URL_2 });
+function getListingConfigs(env) {
+  const listings = [];
+  const defaults = {
+    1: { name: "Habitación", label: "room" },
+    2: { name: "Casa completa", label: "house" },
+  };
+
+  for (let i = 1; i <= 10; i++) {
+    const suffix = i === 1 ? "" : "_" + i;
+    const url = env["ICAL_URL" + suffix];
+    if (!url) continue;
+    const fallback = defaults[i] || { name: "Listing " + i, label: "listing-" + i };
+    listings.push({
+      name: env["LISTING_NAME" + suffix] || fallback.name,
+      label: env["LISTING_LABEL" + suffix] || fallback.label,
+      url,
+    });
   }
+
+  return listings;
+}
+
+async function getAllListings(env) {
+  const listings = getListingConfigs(env);
   const results = [];
   for (const listing of listings) {
     try {
@@ -116,6 +133,17 @@ function rateOk(ip, max) {
   return e.n <= max;
 }
 
+function getBearerToken(req) {
+  const auth = req.headers.get("Authorization") || "";
+  const match = auth.match(/^Bearer\s+(.+)$/i);
+  return match ? match[1].trim() : "";
+}
+
+function isAdminAuthorized(req, url, env) {
+  const token = getBearerToken(req) || url.searchParams.get("key");
+  return token && token === env.ACCESS_KEY;
+}
+
 export default {
   async fetch(req, env) {
     if (req.method === "OPTIONS") return new Response(null, { headers: CORS });
@@ -161,7 +189,7 @@ export default {
         let guestName = "Admin";
         let listingName = "";
 
-        if (body.key === env.ACCESS_KEY) {
+        if (isAdminAuthorized(req, url, env) || body.key === env.ACCESS_KEY) {
           authorized = true;
         } else if (pin && pin.length === 6) {
           const listings = await getAllListings(env);
@@ -194,7 +222,7 @@ export default {
 
       // ---- ADMIN: list PINs (all listings) ----
       if (path === "/api/admin/pins" && req.method === "GET") {
-        if (url.searchParams.get("key") !== env.ACCESS_KEY)
+        if (!isAdminAuthorized(req, url, env))
           return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: CORS });
         const listings = await getAllListings(env);
         const allReservations = [];
@@ -218,7 +246,7 @@ export default {
 
       // ---- STATUS ----
       if (path === "/api/status" && req.method === "GET") {
-        if (url.searchParams.get("key") !== env.ACCESS_KEY)
+        if (!isAdminAuthorized(req, url, env))
           return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: CORS });
         const listings = await getAllListings(env);
         const any = anyActiveReservation(listings, ciHour, coHour);

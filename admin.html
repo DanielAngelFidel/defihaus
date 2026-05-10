@@ -27,7 +27,9 @@ h1{font-size:22px;font-weight:700;margin-bottom:24px}
 .res-pin-value{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#fbbf24;letter-spacing:4px}
 .res-pin-copy{background:#262626;border:none;color:#a3a3a3;padding:6px 12px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit}
 .res-msg{margin-top:8px}
+.res-msg{display:grid;grid-template-columns:1fr;gap:8px}
 .res-msg button{width:100%;padding:10px;background:#262626;border:none;border-radius:8px;color:#a3a3a3;font-size:12px;cursor:pointer;font-family:inherit}
+.res-msg a{display:block;width:100%;padding:10px;background:#171717;border:1px solid #262626;border-radius:8px;color:#d4d4d4;font-size:12px;text-align:center;text-decoration:none}
 .section-title{font-size:11px;color:#525252;text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px}
 .open-btn{width:100%;padding:14px;background:#1a3a2a;border:1px solid #22c55e;border-radius:10px;color:#4ade80;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:20px;font-family:inherit}
 .log{background:#141414;border:1px solid #1f1f1f;border-radius:8px;padding:10px 14px;margin-bottom:6px;font-size:12px;color:#737373;display:flex;justify-content:space-between}
@@ -44,16 +46,62 @@ h1{font-size:22px;font-weight:700;margin-bottom:24px}
 <div class="toast" id="toast">Copiado</div>
 <script>
 const WORKER="https://puerta-narvarte.danielangelfidel.workers.dev";
-const KEY="dh-narv-2026-secreto";
+const ACCESS_URL="https://navarte2.romanortehost.com";
+const ROOM_ONE_GUIDE_URL=ACCESS_URL+"/checkin-habitacion-uno.html";
+const ARRIVAL_STEPS=[
+  {
+    image:"",
+    text:"Check-in is after 4:00 p.m."
+  },
+  {
+    image:"",
+    text:"Once you are at the door, simply open the following link and enter the code we will send you below. You will see a padlock icon at the top; just click on the padlock, and the door will open."
+  },
+  {
+    image:"",
+    text:"The door will ring, and you will need to push the door open to enter the building."
+  },
+  {
+    image:"",
+    text:"Go up the stairs in front of you. Right on the right side is our apartment."
+  },
+  {
+    image:"",
+    text:"The keys to the apartment are inside the lockbox located on the door. The code is 0000, and slide the lever down."
+  },
+  {
+    image:"",
+    text:"The colored key is for the apartment. The square key is for the building. The third key is for your room."
+  },
+  {
+    image:"",
+    text:"Your room is #1, and your trash can is in the kitchen in a solo #1. Please remember that this is a shared space, and we ask that you respect all the rules of coexistence during your stay."
+  },
+  {
+    image:"",
+    text:"Your room is on the right as you enter the apartment, next to the kitchen."
+  }
+];
 const $=id=>document.getElementById(id);
 let logs=JSON.parse(localStorage.getItem("dh_logs")||"[]");
+let adminKey="";
+
+function adminHeaders(){
+  return {Authorization:"Bearer "+adminKey};
+}
+
+function toast(message){
+  $("toast").textContent=message||"Copiado";
+  $("toast").classList.add("show");
+  setTimeout(()=>{$("toast").classList.remove("show");$("toast").textContent="Copiado"},2000);
+}
 
 function renderLogin(){
 $("app").innerHTML=`
-<div class="login">
+  <div class="login">
   <div class="brand">Defihaus Admin</div>
   <div style="font-size:16px;font-weight:600;margin-bottom:20px;color:#d4d4d4">PIN de administrador</div>
-  <input type="password" id="pin" placeholder="••••" maxlength="20">
+  <input type="password" id="pin" placeholder="••••" maxlength="80" autocomplete="current-password">
   <button onclick="login()">Entrar</button>
   <div class="err" id="err"></div>
 </div>`;
@@ -62,14 +110,16 @@ $("pin").addEventListener("keydown",e=>{if(e.key==="Enter")login()});
 }
 
 function login(){
-  if($("pin").value===KEY){renderDashboard()}
-  else{$("err").textContent="PIN incorrecto"}
+  adminKey=$("pin").value.trim();
+  if(!adminKey){$("err").textContent="Ingresa el PIN de administrador";return}
+  renderDashboard();
 }
 
 async function renderDashboard(){
 $("app").innerHTML='<div class="brand">Defihaus</div><h1>Admin Dashboard</h1><div style="text-align:center"><div class="spinner"></div><div style="font-size:12px;color:#525252;margin-top:8px">Cargando reservas...</div></div>';
 try{
-  const r=await fetch(WORKER+"/api/admin/pins?key="+KEY);
+  const r=await fetch(WORKER+"/api/admin/pins",{headers:adminHeaders()});
+  if(r.status===401){adminKey="";renderLogin();$("err").textContent="PIN incorrecto o no actualizado en Cloudflare";return}
   const d=await r.json();
   let html='<div class="brand">Defihaus</div><h1>Admin Dashboard</h1>';
   
@@ -108,10 +158,20 @@ try{
 
 function renderRes(r,type){
 const badge=type==="active"?'<span class="res-badge badge-active">ACTIVO</span>':'<span class="res-badge badge-upcoming">PRÓXIMO</span>';
-const listBadge=r.listing?'<span class="res-badge" style="background:'+(r.label==="room"?"#1e1b4b;color:#818cf8":"#2e1b0e;color:#fb923c")+'">'+r.listing+'</span>':"";
+const listingStyles={
+  room:"#1e1b4b;color:#818cf8",
+  house:"#2e1b0e;color:#fb923c",
+  "listing-3":"#042f2e;color:#2dd4bf",
+  "listing-4":"#3b0764;color:#d8b4fe",
+  "listing-5":"#3f1d1d;color:#fca5a5"
+};
+const listBadge=r.listing?'<span class="res-badge" style="background:'+(listingStyles[r.label]||"#1c1917;color:#a8a29e")+'">'+r.listing+'</span>':"";
 const ci=new Date(r.checkIn).toLocaleDateString("es-MX",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
 const co=new Date(r.checkOut).toLocaleDateString("es-MX",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
-const msg=encodeURIComponent("¡Hola!\\n\\nTu PIN de acceso para abrir la puerta del edificio es:\\n\\n🔑 "+r.pin+"\\n\\nÚsalo en este link:\\n👉 navarte2.romanortehost.com\\n\\n¡Que disfrutes tu estancia!");
+const guestArg=JSON.stringify(r.guest||"");
+const pinArg=JSON.stringify(r.pin||"");
+const listingArg=JSON.stringify(r.listing||"");
+const guideUrl=isRoomWithPrivateBath(r.listing)?ROOM_ONE_GUIDE_URL:"";
 return`<div class="reservation">
 <div class="res-header"><span class="res-guest">${r.guest}</span><div>${listBadge} ${badge}</div></div>
 <div class="res-dates">📅 ${ci} → ${co}</div>
@@ -119,7 +179,10 @@ return`<div class="reservation">
   <div><div class="res-pin-label">PIN</div><div class="res-pin-value">${r.pin}</div></div>
   <button class="res-pin-copy" onclick="cp('${r.pin}')">Copiar</button>
 </div>
-<div class="res-msg"><button onclick="cpMsg('${r.guest}','${r.pin}')">📋 Copiar mensaje completo para Airbnb</button></div>
+<div class="res-msg">
+  <button onclick='cpMsg(${guestArg},${pinArg},${listingArg})'>📋 Copiar mensaje Airbnb + guía visual</button>
+  ${guideUrl?`<a href="${guideUrl}" target="_blank">Ver guía visual</a>`:""}
+</div>
 </div>`;
 }
 
@@ -127,7 +190,7 @@ async function adminOpen(){
 const btn=$("openBtn");
 btn.textContent="🔓 Abriendo...";btn.disabled=true;
 try{
-  const r=await fetch(WORKER+"/api/open",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({key:KEY})});
+  const r=await fetch(WORKER+"/api/open",{method:"POST",headers:{...adminHeaders(),"Content-Type":"application/json"},body:"{}"});
   const d=await r.json();
   if(d.success){
     btn.textContent="✅ Puerta abierta";btn.style.borderColor="#34d399";
@@ -141,20 +204,92 @@ try{
 }catch(e){btn.textContent="❌ Error";setTimeout(()=>{btn.textContent="🔓 Abrir puerta (admin)";btn.disabled=false},2000)}
 }
 
-function cp(t){navigator.clipboard.writeText(t).then(()=>{$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),1500)})}
+function cp(t){navigator.clipboard.writeText(t).then(()=>toast("Copiado"))}
 
-function cpMsg(guest,pin){
-const msg=`¡Hola!
+function isRoomWithPrivateBath(listing){
+  return (listing||"").toLowerCase().includes("aseo dentro");
+}
 
-Tu PIN de acceso para abrir la puerta del edificio es:
+function generalAirbnbMessage(pin,listing){
+const listingLine=listing?`\nAlojamiento: ${listing}\n`:"";
+return`Hola,
 
-🔑 ${pin}
+Tu llegada es sencilla. Te compartimos un código para abrir automáticamente la entrada principal del edificio.${listingLine}
+Link de acceso:
+${ACCESS_URL}
 
-Úsalo en este link:
-👉 navarte2.romanortehost.com
+PIN:
+${pin}
 
-¡Que disfrutes tu estancia!`;
-navigator.clipboard.writeText(msg).then(()=>{$("toast").textContent="Mensaje copiado";$("toast").classList.add("show");setTimeout(()=>{$("toast").classList.remove("show");$("toast").textContent="Copiado"},2000)})
+Cuando estés en la entrada del edificio, abre el link, introduce el PIN y toca el icono del candado para abrir la puerta principal.
+
+En el mismo link también encontrarás el WiFi, la dirección, las reglas de la casa y recomendaciones del barrio.
+
+Si tienes cualquier duda durante tu llegada, escríbenos por aquí y te ayudamos.`;
+}
+
+function generalAirbnbHtmlMessage(pin,listing){
+const listingHtml=listing?`<p><strong>Alojamiento:</strong> ${listing}</p>`:"";
+return`<div>
+  <p>Hola,</p>
+  <p>Tu llegada es sencilla. Te compartimos un código para abrir automáticamente la entrada principal del edificio.</p>
+  ${listingHtml}
+  <p><strong>Link de acceso:</strong><br><a href="${ACCESS_URL}">${ACCESS_URL}</a></p>
+  <p><strong>PIN:</strong><br><span style="font-size:22px;font-weight:700;letter-spacing:3px">${pin}</span></p>
+  <p>Cuando estés en la entrada del edificio, abre el link, introduce el PIN y toca el icono del candado para abrir la puerta principal.</p>
+  <p>En el mismo link también encontrarás el WiFi, la dirección, las reglas de la casa y recomendaciones del barrio.</p>
+  <p>Si tienes cualquier duda durante tu llegada, escríbenos por aquí y te ayudamos.</p>
+</div>`;
+}
+
+function airbnbMessage(pin,listing){
+if(!isRoomWithPrivateBath(listing)) return generalAirbnbMessage(pin,listing);
+const guideUrl=ROOM_ONE_GUIDE_URL+"?pin="+encodeURIComponent(pin);
+return`Hola,
+
+Esta es la guía para hacer el check-in:
+${guideUrl}
+
+Esta es la guía para tu estancia:
+${ACCESS_URL}
+
+Tu PIN de acceso es:
+${pin}
+
+Esperamos que tengas una muy buena estancia. Si tienes cualquier duda durante tu llegada, escríbenos por aquí y te ayudamos.`;
+}
+
+function airbnbHtmlMessage(pin,listing){
+if(!isRoomWithPrivateBath(listing)) return generalAirbnbHtmlMessage(pin,listing);
+const guideUrl=ROOM_ONE_GUIDE_URL+"?pin="+encodeURIComponent(pin);
+return`<div>
+  <p>Hola,</p>
+  <p>Esta es la guía para hacer el check-in:<br><a href="${guideUrl}">${guideUrl}</a></p>
+  <p>Esta es la guía para tu estancia:<br><a href="${ACCESS_URL}">${ACCESS_URL}</a></p>
+  <p><strong>Tu PIN de acceso es:</strong><br><span style="font-size:22px;font-weight:700;letter-spacing:3px">${pin}</span></p>
+  <p>Esperamos que tengas una muy buena estancia. Si tienes cualquier duda durante tu llegada, escríbenos por aquí y te ayudamos.</p>
+</div>`;
+}
+
+async function cpMsg(guest,pin,listing){
+const text=airbnbMessage(pin,listing);
+const html=airbnbHtmlMessage(pin,listing);
+try{
+  if(window.ClipboardItem){
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        "text/plain":new Blob([text],{type:"text/plain"}),
+        "text/html":new Blob([html],{type:"text/html"})
+      })
+    ]);
+  }else{
+    await navigator.clipboard.writeText(text);
+  }
+  toast(ARRIVAL_STEPS.some(step=>step.image)?"Mensaje visual copiado":"Mensaje copiado");
+}catch(e){
+  await navigator.clipboard.writeText(text);
+  toast("Mensaje copiado");
+}
 }
 
 renderLogin();

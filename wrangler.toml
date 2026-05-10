@@ -3,11 +3,16 @@ main = "worker.js"
 compatibility_date = "2024-01-01"
 
 [vars]
-CHECKIN_HOUR = "15"
+CHECKIN_HOUR = "16"
 CHECKOUT_HOUR = "11"
 SHELLY_DEVICE_ID = "a085e3c9b840"
 SHELLY_SERVER = "shelly-247-eu.shelly.cloud"
-ACCESS_KEY = "dh-narv-2026-secreto"
+ACCESS_KEY = "acapulco2024"
 ICAL_URL = "https://www.airbnb.com/calendar/ical/1574837156020290632.ics?t=0c1f056f3ec645619cfa39f465d01004&locale=en"
+LISTING_NAME = "habitacion dos"
 ICAL_URL_2 = "https://www.airbnb.mx/calendar/ical/1588504890958663315.ics?t=8a3bf5f356484ded974939146e4a6e3e"
+LISTING_NAME_2 = "Casa completa"
+ICAL_URL_3 = "https://www.airbnb.com/calendar/ical/1662410715707599727.ics?t=b4f84177342f4ea9a7e1a61e7e912a8d"
+LISTING_NAME_3 = "habitacion uno (aseo dentro)"
+# Para agregar otro listing, define ICAL_URL_4 y opcionalmente LISTING_NAME_4/LISTING_LABEL_4.
 NTFY_TOPIC = "defihaus-narvarte-door"

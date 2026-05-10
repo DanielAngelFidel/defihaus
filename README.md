@@ -27,11 +27,17 @@
 | `SHELLY_DEVICE_ID` | `a085e3c9b840` |
 | `SHELLY_SERVER` | `shelly-247-eu.shelly.cloud` |
 | `ICAL_URL` | `https://www.airbnb.com/calendar/ical/1574837156020290632.ics?t=0c1f056f3ec645619cfa39f465d01004&locale=en` |
+| `ICAL_URL_2` | Calendario iCal del segundo listing |
+| `LISTING_NAME_2` | Nombre visible del segundo listing, por ejemplo `Casa completa` |
+| `ICAL_URL_3` | Calendario iCal del tercer listing |
+| `LISTING_NAME_3` | Nombre visible del tercer listing, por ejemplo `Depto 2` |
 | `ACCESS_KEY` | `dh-narv-2026-CAMBIA-ESTO` ← inventa algo largo |
-| `CHECKIN_HOUR` | `15` |
+| `CHECKIN_HOUR` | `16` |
 | `CHECKOUT_HOUR` | `11` |
 
 13. Clic en **Save and Deploy**
+
+Para agregar más listings después, usa el mismo patrón: `ICAL_URL_4`, `LISTING_NAME_4`, `ICAL_URL_5`, etc.
 
 Tu Worker estará en: `https://puerta-narvarte.TU-SUBDOMINIO.workers.dev`
 
