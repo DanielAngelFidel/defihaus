@@ -47,8 +47,9 @@ h1{font-size:22px;font-weight:700;margin-bottom:24px}
 <script>
 const WORKER="https://puerta-narvarte.danielangelfidel.workers.dev";
 const ACCESS_URL="https://navarte2.romanortehost.com";
-const ROOM_ONE_GUIDE_URL=ACCESS_URL+"/checkin-habitacion-uno.html";
-const HOUSE_GUIDE_URL=ACCESS_URL+"/checkin-casa-completa.html";
+const ROOM_ONE_GUIDE_URL=ACCESS_URL+"/checkin-habitacion-uno";
+const ROOM_TWO_GUIDE_URL=ACCESS_URL+"/checkin-habitacion-dos";
+const HOUSE_GUIDE_URL=ACCESS_URL+"/checkin-casa-completa";
 const ARRIVAL_STEPS=[
   {
     image:"",
@@ -211,12 +212,18 @@ function isRoomWithPrivateBath(listing){
   return (listing||"").toLowerCase().includes("aseo dentro");
 }
 
+function isRoomTwo(listing){
+  const value=(listing||"").toLowerCase();
+  return value.includes("habitacion dos")||value.includes("habitación dos");
+}
+
 function isFullHouse(listing){
   return (listing||"").toLowerCase().includes("casa completa");
 }
 
 function guideUrlForListing(listing){
   if(isRoomWithPrivateBath(listing)) return ROOM_ONE_GUIDE_URL;
+  if(isRoomTwo(listing)) return ROOM_TWO_GUIDE_URL;
   if(isFullHouse(listing)) return HOUSE_GUIDE_URL;
   return "";
 }
