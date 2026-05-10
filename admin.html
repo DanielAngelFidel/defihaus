@@ -22,16 +22,14 @@ h1{font-size:22px;font-weight:700;margin-bottom:24px}
 .badge-upcoming{background:#1e1b4b;color:#818cf8}
 .badge-expired{background:#1c1917;color:#78716c}
 .res-dates{font-size:12px;color:#737373;margin-bottom:10px}
-.res-pin{display:flex;align-items:center;justify-content:space-between;background:#1a1a1a;padding:10px 14px;border-radius:8px}
+.res-pin{background:#1a1a1a;padding:10px 14px;border-radius:8px}
 .res-pin-label{font-size:11px;color:#525252}
 .res-pin-value{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#fbbf24;letter-spacing:4px}
-.res-pin-copy{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;background:#262626;border:none;color:#a3a3a3;padding:0;border-radius:6px;cursor:pointer}
-.res-pin-copy svg{width:16px;height:16px;stroke:currentColor}
-.res-pin-copy:hover{background:#333;color:#e5e5e5}
-.res-msg{margin-top:8px}
-.res-msg{display:grid;grid-template-columns:1fr;gap:8px}
-.res-msg button{width:100%;padding:10px;background:#262626;border:none;border-radius:8px;color:#a3a3a3;font-size:12px;cursor:pointer;font-family:inherit}
-.res-msg a{display:block;width:100%;padding:10px;background:#171717;border:1px solid #262626;border-radius:8px;color:#d4d4d4;font-size:12px;text-align:center;text-decoration:none}
+.res-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.res-actions button{width:100%;padding:12px 10px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.copy-pin-action{background:#3b2f13;color:#fbbf24}
+.message-action{background:#262626;color:#d4d4d4}
+.res-actions button:hover{filter:brightness(1.12)}
 .section-title{font-size:11px;color:#525252;text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px}
 .open-btn{width:100%;padding:14px;background:#1a3a2a;border:1px solid #22c55e;border-radius:10px;color:#4ade80;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:20px;font-family:inherit}
 .log{background:#141414;border:1px solid #1f1f1f;border-radius:8px;padding:10px 14px;margin-bottom:6px;font-size:12px;color:#737373;display:flex;justify-content:space-between}
@@ -174,17 +172,17 @@ const co=new Date(r.checkOut).toLocaleDateString("es-MX",{weekday:"short",day:"n
 const guestArg=JSON.stringify(r.guest||"");
 const pinArg=JSON.stringify(r.pin||"");
 const listingArg=JSON.stringify(r.listing||"");
-const guideUrl=guideUrlWithPin(r.listing,r.pin);
+const guestName=(r.guest||"").toLowerCase()==="reserved"?"Reserva Airbnb":r.guest;
 return`<div class="reservation">
-<div class="res-header"><span class="res-guest">${r.guest}</span><div>${listBadge} ${badge}</div></div>
+<div class="res-header"><span class="res-guest">${guestName}</span><div>${listBadge} ${badge}</div></div>
 <div class="res-dates">📅 ${ci} → ${co}</div>
 <div class="res-pin">
-  <div><div class="res-pin-label">PIN</div><div class="res-pin-value">${r.pin}</div></div>
-  <button class="res-pin-copy" onclick="cp('${r.pin}')" aria-label="Copiar PIN" title="Copiar PIN"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+  <div class="res-pin-label">PIN</div>
+  <div class="res-pin-value">${r.pin}</div>
 </div>
-<div class="res-msg">
-  <button onclick='cpMsg(${guestArg},${pinArg},${listingArg})'>📋 Copiar mensaje Airbnb + guía visual</button>
-  ${guideUrl?`<a href="${guideUrl}" target="_blank">Ver guía visual</a>`:""}
+<div class="res-actions">
+  <button class="copy-pin-action" onclick='cp(${pinArg})'>Copiar PIN</button>
+  <button class="message-action" onclick='cpMsg(${guestArg},${pinArg},${listingArg})'>Copiar mensaje</button>
 </div>
 </div>`;
 }
