@@ -33,6 +33,8 @@ h1{font-size:28px;line-height:1.05;margin:0 0 10px;font-weight:800}
 .open-btn[hidden]{display:none}
 .open-status{font-size:13px;color:#d6d3d1;margin-top:10px;min-height:18px}
 .muted{font-size:12px;color:#78716c;margin-top:18px}
+.whatsapp-float{position:fixed;right:16px;bottom:16px;z-index:20;display:flex;align-items:center;justify-content:center;border-radius:999px;background:#25d366;color:#0b2e18;text-decoration:none;font-size:14px;font-weight:800;padding:12px 16px;box-shadow:0 10px 28px rgba(0,0,0,.22)}
+.whatsapp-float:focus,.whatsapp-float:hover{background:#20bd5a;color:#082412}
 a{color:#1c1917;font-weight:700}
 </style>
 </head>
@@ -81,7 +83,7 @@ a{color:#1c1917;font-weight:700}
 
   <div class="card">
     <div class="step"><div class="num">5</div><div class="text">Las llaves del departamento están dentro de la caja de seguridad en la puerta. El código es <strong>0000</strong>; desliza la palanca hacia abajo para abrirla.</div></div>
-    <img class="photo" src="/arrival/habitacion-uno/05-lockbox.jpg?v=20260510-3" alt="Caja de seguridad en la puerta del departamento" onerror="this.hidden=true">
+    <img class="photo" src="/arrival/habitacion-uno/05-lockbox.jpg?v=20260510-4" alt="Caja de seguridad en la puerta del departamento" onerror="this.hidden=true">
   </div>
 
   <div class="card">
@@ -91,6 +93,7 @@ a{color:#1c1917;font-weight:700}
 
   <p class="muted">Si tienes cualquier duda durante tu llegada, escríbenos por Airbnb y te ayudamos.</p>
 </main>
+<a class="whatsapp-float" href="https://wa.me/5215637466309?text=Hola%2C%20tengo%20un%20problema%20con%20mi%20llegada%20a%20Defihaus%20Narvarte." target="_blank" rel="noopener">Ayuda por WhatsApp</a>
 <script>
 const WORKER_URL="https://puerta-narvarte.danielangelfidel.workers.dev";
 let validPin="";
