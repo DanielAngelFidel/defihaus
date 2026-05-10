@@ -26,15 +26,23 @@ h1{font-size:28px;line-height:1.05;margin:0 0 10px;font-weight:800}
 .access{background:#1c1917;color:#fff;border-radius:10px;padding:14px;margin-top:12px}
 .access-label{font-size:12px;color:#d6d3d1;margin-bottom:10px}
 .pin-row{display:grid;grid-template-columns:1fr auto;gap:8px}
+.pin-field{position:relative;min-width:0}
 .pin-input{width:100%;border:1px solid #57534e;border-radius:8px;background:#0c0a09;color:#fff;font-size:20px;font-weight:800;letter-spacing:4px;padding:12px;text-align:center;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;outline:none}
+.pin-input.has-copy{padding-right:48px}
+.copy-pin-btn{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #44403c;border-radius:7px;background:#1c1917;color:#d6d3d1;cursor:pointer}
+.copy-pin-btn svg{width:16px;height:16px;stroke:currentColor}
+.copy-pin-btn:focus,.copy-pin-btn:hover{background:#292524;color:#fff}
 .verify-btn,.open-btn{border:0;border-radius:8px;background:#fff;color:#1c1917;font-weight:800;font-size:14px;padding:12px 14px;cursor:pointer}
 .open-btn{width:100%;margin-top:10px}
 .verify-btn:disabled,.open-btn:disabled{opacity:.58;cursor:default}
 .open-btn[hidden]{display:none}
 .open-status{font-size:13px;color:#d6d3d1;margin-top:10px;min-height:18px}
 .muted{font-size:12px;color:#78716c;margin-top:18px}
-.whatsapp-float{position:fixed;right:16px;bottom:16px;z-index:20;display:flex;align-items:center;justify-content:center;border-radius:999px;background:#25d366;color:#0b2e18;text-decoration:none;font-size:14px;font-weight:800;padding:12px 16px;box-shadow:0 10px 28px rgba(0,0,0,.22)}
-.whatsapp-float:focus,.whatsapp-float:hover{background:#20bd5a;color:#082412}
+.whatsapp-float{position:fixed;right:16px;bottom:16px;z-index:20;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border-radius:999px;background:#25d366;color:#fff;text-decoration:none;font-size:14px;font-weight:800;padding:12px 16px;box-shadow:0 10px 28px rgba(0,0,0,.22);transition:transform .15s ease,background .15s ease,box-shadow .15s ease}
+.whatsapp-float svg{width:22px;height:22px;flex:0 0 auto;fill:currentColor}
+.whatsapp-float:focus,.whatsapp-float:hover{background:#1ebe5d;color:#fff;transform:translateY(-1px);box-shadow:0 14px 32px rgba(0,0,0,.24)}
+.whatsapp-float:focus-visible{outline:3px solid rgba(37,211,102,.35);outline-offset:3px}
+@media (max-width:640px){.whatsapp-float{width:52px;height:52px;min-height:52px;padding:0}.whatsapp-float span{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}.whatsapp-float svg{width:26px;height:26px}}
 a{color:#1c1917;font-weight:700}
 </style>
 </head>
@@ -62,7 +70,10 @@ a{color:#1c1917;font-weight:700}
     <div class="access">
       <div class="access-label">PIN de acceso</div>
       <div class="pin-row">
-        <input class="pin-input" id="pinInput" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code">
+        <div class="pin-field">
+          <input class="pin-input has-copy" id="pinInput" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code">
+          <button class="copy-pin-btn" type="button" onclick="copyPin()" aria-label="Copiar PIN" title="Copiar PIN"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+        </div>
         <button class="verify-btn" id="verifyBtn" onclick="verifyPin()">Validar</button>
       </div>
       <button class="open-btn" id="openBtn" onclick="openDoor()" hidden>Abrir puerta</button>
@@ -78,7 +89,7 @@ a{color:#1c1917;font-weight:700}
 
   <div class="card">
     <div class="step"><div class="num">4</div><div class="text">Sube las escaleras que están frente a ti. Nuestro departamento queda del lado derecho.</div></div>
-    <img class="photo" src="/arrival/habitacion-uno/04-stairs.jpg?v=20260510-3" alt="Escaleras hacia el departamento" onerror="this.hidden=true">
+    <img class="photo" src="/arrival/habitacion-uno/04-stairs.jpg?v=20260510-5" alt="Escaleras hacia el departamento" onerror="this.hidden=true">
   </div>
 
   <div class="card">
@@ -93,7 +104,10 @@ a{color:#1c1917;font-weight:700}
 
   <p class="muted">Si tienes cualquier duda durante tu llegada, escríbenos por Airbnb y te ayudamos.</p>
 </main>
-<a class="whatsapp-float" href="https://wa.me/5215637466309?text=Hola%2C%20tengo%20un%20problema%20con%20mi%20llegada%20a%20Defihaus%20Narvarte." target="_blank" rel="noopener">Ayuda por WhatsApp</a>
+<a class="whatsapp-float" href="https://wa.me/5215637466309?text=Hola%2C%20tengo%20un%20problema%20con%20mi%20llegada%20a%20Defihaus%20Narvarte." target="_blank" rel="noopener" aria-label="Ayuda por WhatsApp">
+  <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16.04 3C8.89 3 3.08 8.78 3.08 15.89c0 2.27.6 4.48 1.73 6.43L3 29l6.87-1.79a13.03 13.03 0 0 0 6.17 1.56C23.19 28.77 29 23 29 15.89S23.19 3 16.04 3Zm0 23.6c-1.98 0-3.91-.53-5.6-1.53l-.4-.23-4.08 1.06 1.09-3.96-.26-.41a10.65 10.65 0 0 1-1.55-5.64c0-5.92 4.85-10.73 10.8-10.73s10.8 4.81 10.8 10.73-4.85 10.71-10.8 10.71Zm5.92-8.02c-.32-.16-1.91-.94-2.2-1.05-.3-.11-.51-.16-.73.16-.21.32-.83 1.05-1.02 1.27-.19.21-.38.24-.7.08-.32-.16-1.37-.5-2.61-1.6-.96-.86-1.62-1.92-1.81-2.24-.19-.32-.02-.5.14-.65.15-.15.32-.38.49-.57.16-.19.21-.32.32-.54.11-.21.05-.4-.03-.56-.08-.16-.73-1.75-1-2.4-.26-.63-.53-.54-.73-.55h-.62c-.21 0-.56.08-.86.4-.3.32-1.13 1.1-1.13 2.69s1.16 3.12 1.32 3.34c.16.21 2.28 3.47 5.52 4.86.77.33 1.37.53 1.84.68.77.24 1.48.21 2.04.13.62-.09 1.91-.78 2.18-1.53.27-.75.27-1.4.19-1.53-.08-.14-.3-.22-.62-.38Z"/></svg>
+  <span>Ayuda por WhatsApp</span>
+</a>
 <script>
 const WORKER_URL="https://puerta-narvarte.danielangelfidel.workers.dev";
 let validPin="";
@@ -108,6 +122,25 @@ pinInput.addEventListener("input",()=>{
   status.textContent="";
 });
 pinInput.addEventListener("keydown",e=>{if(e.key==="Enter")verifyPin()});
+prefillPinFromUrl();
+
+function prefillPinFromUrl(){
+  const pin=new URLSearchParams(window.location.search).get("pin");
+  if(!pin) return;
+  pinInput.value=pin.replace(/[^0-9]/g,"").slice(0,6);
+}
+
+async function copyPin(){
+  const pin=pinInput.value.trim();
+  if(pin.length!==6){status.textContent="Primero escribe los 6 dígitos del PIN.";return}
+  try{
+    await navigator.clipboard.writeText(pin);
+    status.textContent="PIN copiado.";
+  }catch(e){
+    pinInput.select();
+    status.textContent="PIN seleccionado. Ahora puedes copiarlo.";
+  }
+}
 
 async function verifyPin(){
   const pin=pinInput.value.trim();

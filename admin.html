@@ -25,7 +25,9 @@ h1{font-size:22px;font-weight:700;margin-bottom:24px}
 .res-pin{display:flex;align-items:center;justify-content:space-between;background:#1a1a1a;padding:10px 14px;border-radius:8px}
 .res-pin-label{font-size:11px;color:#525252}
 .res-pin-value{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#fbbf24;letter-spacing:4px}
-.res-pin-copy{background:#262626;border:none;color:#a3a3a3;padding:6px 12px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit}
+.res-pin-copy{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;background:#262626;border:none;color:#a3a3a3;padding:0;border-radius:6px;cursor:pointer}
+.res-pin-copy svg{width:16px;height:16px;stroke:currentColor}
+.res-pin-copy:hover{background:#333;color:#e5e5e5}
 .res-msg{margin-top:8px}
 .res-msg{display:grid;grid-template-columns:1fr;gap:8px}
 .res-msg button{width:100%;padding:10px;background:#262626;border:none;border-radius:8px;color:#a3a3a3;font-size:12px;cursor:pointer;font-family:inherit}
@@ -172,13 +174,13 @@ const co=new Date(r.checkOut).toLocaleDateString("es-MX",{weekday:"short",day:"n
 const guestArg=JSON.stringify(r.guest||"");
 const pinArg=JSON.stringify(r.pin||"");
 const listingArg=JSON.stringify(r.listing||"");
-const guideUrl=guideUrlForListing(r.listing);
+const guideUrl=guideUrlWithPin(r.listing,r.pin);
 return`<div class="reservation">
 <div class="res-header"><span class="res-guest">${r.guest}</span><div>${listBadge} ${badge}</div></div>
 <div class="res-dates">📅 ${ci} → ${co}</div>
 <div class="res-pin">
   <div><div class="res-pin-label">PIN</div><div class="res-pin-value">${r.pin}</div></div>
-  <button class="res-pin-copy" onclick="cp('${r.pin}')">Copiar</button>
+  <button class="res-pin-copy" onclick="cp('${r.pin}')" aria-label="Copiar PIN" title="Copiar PIN"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
 </div>
 <div class="res-msg">
   <button onclick='cpMsg(${guestArg},${pinArg},${listingArg})'>📋 Copiar mensaje Airbnb + guía visual</button>
@@ -221,74 +223,95 @@ function guideUrlForListing(listing){
   return "";
 }
 
+function guideUrlWithPin(listing,pin){
+  const url=guideUrlForListing(listing);
+  if(!url) return "";
+  return `${url}?pin=${encodeURIComponent(pin)}`;
+}
+
 function generalAirbnbMessage(pin,listing){
 const listingLine=listing?`\nAlojamiento: ${listing}\n`:"";
 return`Hola,
 
-Tu llegada es sencilla. Te compartimos un código para abrir automáticamente la entrada principal del edificio.${listingLine}
-Link de acceso:
+¡Bienvenido! Nos da mucho gusto recibirte y esperamos que disfrutes muchísimo tu estancia.
+
+Para que tu llegada sea muy fácil, te compartimos tu acceso digital.${listingLine}
+Guía para tu estancia:
 ${ACCESS_URL}
 
-PIN:
+Tu PIN de acceso es:
 ${pin}
 
-Cuando estés en la entrada del edificio, abre el link, introduce el PIN y toca el icono del candado para abrir la puerta principal.
+Cuando estés en la entrada del edificio, abre la guía, introduce tu PIN y toca el icono del candado para abrir la puerta principal.
 
-En el mismo link también encontrarás el WiFi, la dirección, las reglas de la casa y recomendaciones del barrio.
+En la guía también encontrarás el WiFi, la dirección, las reglas de la casa y recomendaciones del barrio.
 
-Si tienes cualquier duda durante tu llegada, escríbenos por aquí y te ayudamos.`;
+Cualquier duda antes o durante tu llegada, escríbenos por aquí con toda confianza. Estamos pendientes para ayudarte.
+
+¡Que tengas una estancia muy agradable!`;
 }
 
 function generalAirbnbHtmlMessage(pin,listing){
 const listingHtml=listing?`<p><strong>Alojamiento:</strong> ${listing}</p>`:"";
 return`<div>
   <p>Hola,</p>
-  <p>Tu llegada es sencilla. Te compartimos un código para abrir automáticamente la entrada principal del edificio.</p>
+  <p>¡Bienvenido! Nos da mucho gusto recibirte y esperamos que disfrutes muchísimo tu estancia.</p>
+  <p>Para que tu llegada sea muy fácil, te compartimos tu acceso digital.</p>
   ${listingHtml}
-  <p><strong>Link de acceso:</strong><br><a href="${ACCESS_URL}">${ACCESS_URL}</a></p>
-  <p><strong>PIN:</strong><br><span style="font-size:22px;font-weight:700;letter-spacing:3px">${pin}</span></p>
-  <p>Cuando estés en la entrada del edificio, abre el link, introduce el PIN y toca el icono del candado para abrir la puerta principal.</p>
-  <p>En el mismo link también encontrarás el WiFi, la dirección, las reglas de la casa y recomendaciones del barrio.</p>
-  <p>Si tienes cualquier duda durante tu llegada, escríbenos por aquí y te ayudamos.</p>
+  <p><strong>Guía para tu estancia:</strong><br><a href="${ACCESS_URL}">${ACCESS_URL}</a></p>
+  <p><strong>Tu PIN de acceso es:</strong><br><span style="font-size:22px;font-weight:700;letter-spacing:3px">${pin}</span></p>
+  <p>Cuando estés en la entrada del edificio, abre la guía, introduce tu PIN y toca el icono del candado para abrir la puerta principal.</p>
+  <p>En la guía también encontrarás el WiFi, la dirección, las reglas de la casa y recomendaciones del barrio.</p>
+  <p>Cualquier duda antes o durante tu llegada, escríbenos por aquí con toda confianza. Estamos pendientes para ayudarte.</p>
+  <p>¡Que tengas una estancia muy agradable!</p>
 </div>`;
 }
 
 function airbnbMessage(pin,listing){
-const baseGuideUrl=guideUrlForListing(listing);
+const baseGuideUrl=guideUrlWithPin(listing,pin);
 if(!baseGuideUrl) return generalAirbnbMessage(pin,listing);
 const guideUrl=baseGuideUrl;
 return`Hola,
+
+¡Bienvenido! Nos da mucho gusto recibirte y esperamos que disfrutes muchísimo tu estancia.
 
 Dirección correcta:
 Xochicalco 26, Narvarte Poniente, Benito Juárez, 03000 Ciudad de México.
 La entrada debe decir 26B.
 
-Esta es la guía para hacer el check-in:
+Para que tu llegada sea muy fácil, te compartimos la guía para hacer tu check-in:
 ${guideUrl}
 
-Esta es la guía para tu estancia:
+También te dejamos la guía de la estancia, donde encontrarás información útil sobre el alojamiento:
 ${ACCESS_URL}
 
 Tu PIN de acceso es:
 ${pin}
 
-Introduce este PIN dentro de la guía de check-in. Si Airbnb o Maps te muestran otra ubicación, usa la dirección de este mensaje.
+El link de check-in ya lleva tu PIN cargado. Si necesitas copiarlo, dentro de la guía verás un icono junto al código.
 
-Esperamos que tengas una muy buena estancia. Si tienes cualquier duda durante tu llegada, escríbenos por aquí y te ayudamos.`;
+Si Airbnb o Maps te muestran otra ubicación, usa la dirección de este mensaje.
+
+Cualquier duda antes o durante tu llegada, escríbenos por aquí con toda confianza. Estamos pendientes para ayudarte.
+
+¡Que tengas una estancia muy agradable!`;
 }
 
 function airbnbHtmlMessage(pin,listing){
-const baseGuideUrl=guideUrlForListing(listing);
+const baseGuideUrl=guideUrlWithPin(listing,pin);
 if(!baseGuideUrl) return generalAirbnbHtmlMessage(pin,listing);
 const guideUrl=baseGuideUrl;
 return`<div>
   <p>Hola,</p>
+  <p>¡Bienvenido! Nos da mucho gusto recibirte y esperamos que disfrutes muchísimo tu estancia.</p>
   <p><strong>Dirección correcta:</strong><br>Xochicalco 26, Narvarte Poniente, Benito Juárez, 03000 Ciudad de México.<br>La entrada debe decir <strong>26B</strong>.</p>
-  <p>Esta es la guía para hacer el check-in:<br><a href="${guideUrl}">${guideUrl}</a></p>
-  <p>Esta es la guía para tu estancia:<br><a href="${ACCESS_URL}">${ACCESS_URL}</a></p>
+  <p>Para que tu llegada sea muy fácil, te compartimos la guía para hacer tu check-in:<br><a href="${guideUrl}">${guideUrl}</a></p>
+  <p>También te dejamos la guía de la estancia, donde encontrarás información útil sobre el alojamiento:<br><a href="${ACCESS_URL}">${ACCESS_URL}</a></p>
   <p><strong>Tu PIN de acceso es:</strong><br><span style="font-size:22px;font-weight:700;letter-spacing:3px">${pin}</span></p>
-  <p>Introduce este PIN dentro de la guía de check-in. Si Airbnb o Maps te muestran otra ubicación, usa la dirección de este mensaje.</p>
-  <p>Esperamos que tengas una muy buena estancia. Si tienes cualquier duda durante tu llegada, escríbenos por aquí y te ayudamos.</p>
+  <p>El link de check-in ya lleva tu PIN cargado. Si necesitas copiarlo, dentro de la guía verás un icono junto al código.</p>
+  <p>Si Airbnb o Maps te muestran otra ubicación, usa la dirección de este mensaje.</p>
+  <p>Cualquier duda antes o durante tu llegada, escríbenos por aquí con toda confianza. Estamos pendientes para ayudarte.</p>
+  <p>¡Que tengas una estancia muy agradable!</p>
 </div>`;
 }
 
