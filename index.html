@@ -169,6 +169,7 @@ const L={
   verifying:isEn?"Verifying...":"Verificando...",
   wrongPin:isEn?"Incorrect PIN":"PIN incorrecto",
   noRes:isEn?"No active reservation right now":"No hay reserva activa en este momento",
+  tooEarly:isEn?"Your PIN is correct, but it will only open the door from 4:00 p.m. Mexico time.":"Tu PIN es correcto, pero solo será válido para abrir la puerta a partir de las 4:00 p.m. hora de México.",
   errGeneric:isEn?"Error, try again":"Error, intenta de nuevo",
   errConn:isEn?"Connection error":"Error de conexión",
   welcome:isEn?"Welcome to Narvarte":"Bienvenido a Narvarte",
@@ -294,6 +295,7 @@ async function verifyPin(){$("pinBtn").disabled=true;$("pinBtn").textContent=L.v
 try{const r=await fetch(WORKER_URL+"/api/verify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pin:currentPin})});const d=await r.json();
 if(d.valid){savePin(currentPin);renderActive(d,currentPin)}
 else if(d.error==="wrong_pin"){$("pinError").textContent=L.wrongPin;document.querySelectorAll(".pin-digit").forEach(x=>{x.classList.add("err");x.value=""});document.querySelector(".pin-digit").focus();$("pinBtn").textContent=L.verify}
+else if(d.error==="too_early"){const msg=d.message||L.tooEarly;$("pinError").textContent=msg;alert(msg);$("pinBtn").textContent=L.verify}
 else if(d.error==="no_reservation"){$("pinError").textContent=L.noRes;$("pinBtn").textContent=L.verify}
 else{$("pinError").textContent=L.errGeneric;$("pinBtn").textContent=L.verify}
 }catch(e){$("pinError").textContent=L.errConn;$("pinBtn").textContent=L.verify}}

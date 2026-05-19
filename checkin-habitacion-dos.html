@@ -171,7 +171,12 @@ async function verifyPin(){
       openBtn.hidden=false;
       return;
     }
-    if(data.error==="no_reservation") status.textContent="El acceso todavía no está disponible.";
+    if(data.error==="too_early"){
+      const msg=data.message||"Tu PIN es correcto, pero solo será válido para abrir la puerta a partir de las 4:00 p.m. hora de México.";
+      status.textContent=msg;
+      alert(msg);
+    }
+    else if(data.error==="no_reservation") status.textContent="El acceso todavía no está disponible.";
     else status.textContent="PIN incorrecto. Revisa que sea el PIN del mensaje actual de Airbnb.";
   }catch(e){
     status.textContent="Error de conexión. Inténtalo de nuevo.";

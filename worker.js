@@ -100,13 +100,24 @@ async function getAllListings(env) {
 }
 
 async function findActiveByPin(listings, ciHour, coHour, pin, secret) {
+  const now = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" }));
   for (const listing of listings) {
     const reservations = getReservations(listing.events, ciHour, coHour);
     for (const r of reservations) {
-      if (r.active) {
-        const correctPin = await generatePin(r.startDate, r.endDate, secret);
-        if (pin === correctPin) {
+      const correctPin = await generatePin(r.startDate, r.endDate, secret);
+      if (pin === correctPin) {
+        if (r.active) {
           return { found: true, guest: r.guest, checkOut: r.checkOut, listing: listing.name, label: listing.label };
+        }
+        if (now < new Date(r.checkIn)) {
+          return {
+            found: false,
+            tooEarly: true,
+            guest: r.guest,
+            checkIn: r.checkIn,
+            listing: listing.name,
+            label: listing.label,
+          };
         }
       }
     }
@@ -170,6 +181,16 @@ export default {
           return new Response(JSON.stringify({
             valid: true, guest: match.guest, checkOut: match.checkOut,
             listing: match.listing, label: match.label
+          }), { headers: CORS });
+        }
+        if (match.tooEarly) {
+          return new Response(JSON.stringify({
+            valid: false,
+            error: "too_early",
+            checkIn: match.checkIn,
+            listing: match.listing,
+            label: match.label,
+            message: "Tu PIN es correcto, pero solo será válido para abrir la puerta a partir de las 4:00 p.m. hora de México.",
           }), { headers: CORS });
         }
         const any = anyActiveReservation(listings, ciHour, coHour);
