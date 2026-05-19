@@ -118,20 +118,45 @@ function login(){
   renderDashboard();
 }
 
+function mexicoDateKey(date){
+  const parts=new Intl.DateTimeFormat("en-CA",{
+    timeZone:"America/Mexico_City",
+    year:"numeric",
+    month:"2-digit",
+    day:"2-digit"
+  }).formatToParts(date||new Date());
+  const byType=Object.fromEntries(parts.map(p=>[p.type,p.value]));
+  return `${byType.year}-${byType.month}-${byType.day}`;
+}
+
+function reservationDateKey(value){
+  return (value||"").slice(0,10);
+}
+
+function adminReservationState(r){
+  const today=mexicoDateKey();
+  const checkIn=reservationDateKey(r.checkIn);
+  const checkOut=reservationDateKey(r.checkOut);
+  if(checkIn<=today&&checkOut>=today) return "active";
+  if(checkIn>today) return "upcoming";
+  return "expired";
+}
+
 async function renderDashboard(){
 $("app").innerHTML='<div class="brand">Defihaus</div><h1>Admin Dashboard</h1><div style="text-align:center"><div class="spinner"></div><div style="font-size:12px;color:#525252;margin-top:8px">Cargando reservas...</div></div>';
 try{
   const r=await fetch(WORKER+"/api/admin/pins",{headers:adminHeaders()});
   if(r.status===401){adminKey="";renderLogin();$("err").textContent="PIN incorrecto o no actualizado en Cloudflare";return}
   const d=await r.json();
+  const reservations=d.reservations.map(r=>({...r,adminState:adminReservationState(r)}));
   let html='<div class="brand">Defihaus</div><h1>Admin Dashboard</h1>';
   
   // Open door button (admin override)
   html+='<button class="open-btn" id="openBtn" onclick="adminOpen()">🔓 Abrir puerta (admin)</button>';
   
   // Active reservations
-  const active=d.reservations.filter(r=>r.active);
-  const upcoming=d.reservations.filter(r=>!r.active&&new Date(r.checkOut)>new Date());
+  const active=reservations.filter(r=>r.adminState==="active");
+  const upcoming=reservations.filter(r=>r.adminState==="upcoming");
   
   if(active.length){
     html+='<div class="section-title">Reserva activa</div>';
