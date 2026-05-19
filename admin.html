@@ -131,7 +131,7 @@ try{
   
   // Active reservations
   const active=d.reservations.filter(r=>r.active);
-  const upcoming=d.reservations.filter(r=>!r.active&&new Date(r.checkIn)>new Date());
+  const upcoming=d.reservations.filter(r=>!r.active&&new Date(r.checkOut)>new Date());
   
   if(active.length){
     html+='<div class="section-title">Reserva activa</div>';
