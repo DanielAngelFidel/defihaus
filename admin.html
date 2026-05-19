@@ -261,21 +261,16 @@ return`Hola,
 
 ¡Bienvenido! Nos da mucho gusto recibirte y esperamos que disfrutes muchísimo tu estancia.
 
-Dirección correcta:
-Xochicalco 26, Narvarte Poniente, Benito Juárez, 03000 Ciudad de México.
-La entrada debe decir 26B.
-${listingLine}
-Para que tu llegada sea muy fácil, te compartimos la guía digital para tu estancia:
+Para que tu llegada sea muy fácil, te compartimos tu acceso digital.${listingLine}
+Guía para tu estancia:
 ${ACCESS_URL}
 
 Tu PIN de acceso es:
 ${pin}
 
-Cuando estés en la entrada del edificio, abre la guía digital, introduce tu PIN y toca el icono del candado para abrir la puerta principal.
+Cuando estés en la entrada del edificio, abre la guía, introduce tu PIN y toca el icono del candado para abrir la puerta principal.
 
 En la guía también encontrarás el WiFi, la dirección, las reglas de la casa y recomendaciones del barrio.
-
-Si Airbnb o Maps te muestran otra ubicación, usa la dirección de este mensaje.
 
 Cualquier duda antes o durante tu llegada, escríbenos por aquí con toda confianza. Estamos pendientes para ayudarte.
 
@@ -287,13 +282,12 @@ const listingHtml=listing?`<p><strong>Alojamiento:</strong> ${listing}</p>`:"";
 return`<div>
   <p>Hola,</p>
   <p>¡Bienvenido! Nos da mucho gusto recibirte y esperamos que disfrutes muchísimo tu estancia.</p>
-  <p><strong>Dirección correcta:</strong><br>Xochicalco 26, Narvarte Poniente, Benito Juárez, 03000 Ciudad de México.<br>La entrada debe decir <strong>26B</strong>.</p>
+  <p>Para que tu llegada sea muy fácil, te compartimos tu acceso digital.</p>
   ${listingHtml}
-  <p>Para que tu llegada sea muy fácil, te compartimos la guía digital para tu estancia:<br><a href="${ACCESS_URL}">${ACCESS_URL}</a></p>
+  <p><strong>Guía para tu estancia:</strong><br><a href="${ACCESS_URL}">${ACCESS_URL}</a></p>
   <p><strong>Tu PIN de acceso es:</strong><br><span style="font-size:22px;font-weight:700;letter-spacing:3px">${pin}</span></p>
-  <p>Cuando estés en la entrada del edificio, abre la guía digital, introduce tu PIN y toca el icono del candado para abrir la puerta principal.</p>
+  <p>Cuando estés en la entrada del edificio, abre la guía, introduce tu PIN y toca el icono del candado para abrir la puerta principal.</p>
   <p>En la guía también encontrarás el WiFi, la dirección, las reglas de la casa y recomendaciones del barrio.</p>
-  <p>Si Airbnb o Maps te muestran otra ubicación, usa la dirección de este mensaje.</p>
   <p>Cualquier duda antes o durante tu llegada, escríbenos por aquí con toda confianza. Estamos pendientes para ayudarte.</p>
   <p>¡Que tengas una estancia muy agradable!</p>
 </div>`;
@@ -311,7 +305,7 @@ Dirección correcta:
 Xochicalco 26, Narvarte Poniente, Benito Juárez, 03000 Ciudad de México.
 La entrada debe decir 26B.
 
-Para que tu llegada sea muy fácil, te compartimos la guía digital para hacer tu check-in:
+Para que tu llegada sea muy fácil, te compartimos la guía para hacer tu check-in:
 ${guideUrl}
 
 También te dejamos la guía de la estancia, donde encontrarás información útil sobre el alojamiento:
@@ -320,7 +314,7 @@ ${ACCESS_URL}
 Tu PIN de acceso es:
 ${pin}
 
-El link de check-in ya lleva tu PIN cargado. Si necesitas copiarlo, dentro de la guía digital verás un icono junto al código.
+El link de check-in ya lleva tu PIN cargado. Si necesitas copiarlo, dentro de la guía verás un icono junto al código.
 
 Si Airbnb o Maps te muestran otra ubicación, usa la dirección de este mensaje.
 
@@ -337,10 +331,10 @@ return`<div>
   <p>Hola,</p>
   <p>¡Bienvenido! Nos da mucho gusto recibirte y esperamos que disfrutes muchísimo tu estancia.</p>
   <p><strong>Dirección correcta:</strong><br>Xochicalco 26, Narvarte Poniente, Benito Juárez, 03000 Ciudad de México.<br>La entrada debe decir <strong>26B</strong>.</p>
-  <p>Para que tu llegada sea muy fácil, te compartimos la guía digital para hacer tu check-in:<br><a href="${guideUrl}">${guideUrl}</a></p>
+  <p>Para que tu llegada sea muy fácil, te compartimos la guía para hacer tu check-in:<br><a href="${guideUrl}">${guideUrl}</a></p>
   <p>También te dejamos la guía de la estancia, donde encontrarás información útil sobre el alojamiento:<br><a href="${ACCESS_URL}">${ACCESS_URL}</a></p>
   <p><strong>Tu PIN de acceso es:</strong><br><span style="font-size:22px;font-weight:700;letter-spacing:3px">${pin}</span></p>
-  <p>El link de check-in ya lleva tu PIN cargado. Si necesitas copiarlo, dentro de la guía digital verás un icono junto al código.</p>
+  <p>El link de check-in ya lleva tu PIN cargado. Si necesitas copiarlo, dentro de la guía verás un icono junto al código.</p>
   <p>Si Airbnb o Maps te muestran otra ubicación, usa la dirección de este mensaje.</p>
   <p>Cualquier duda antes o durante tu llegada, escríbenos por aquí con toda confianza. Estamos pendientes para ayudarte.</p>
   <p>¡Que tengas una estancia muy agradable!</p>
@@ -361,7 +355,7 @@ try{
   }else{
     await navigator.clipboard.writeText(text);
   }
-  toast("Mensaje digital copiado");
+  toast(ARRIVAL_STEPS.some(step=>step.image)?"Mensaje visual copiado":"Mensaje copiado");
 }catch(e){
   await navigator.clipboard.writeText(text);
   toast("Mensaje copiado");
