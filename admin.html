@@ -199,7 +199,8 @@ const co=new Date(r.checkOut).toLocaleDateString("es-MX",{weekday:"short",day:"n
 const guestArg=JSON.stringify(r.guest||"");
 const pinArg=JSON.stringify(r.pin||"");
 const listingArg=JSON.stringify(r.listing||"");
-const guideUrl=guideUrlWithPin(r.listing,r.pin);
+const labelArg=JSON.stringify(r.label||"");
+const guideUrl=guideUrlWithPin(r.listing,r.pin,r.label);
 return`<div class="reservation">
 <div class="res-header"><span class="res-guest">${r.guest}</span><div>${listBadge} ${badge}</div></div>
 <div class="res-dates">📅 ${ci} → ${co}</div>
@@ -208,8 +209,8 @@ return`<div class="reservation">
   <button class="res-pin-copy" onclick="cp('${r.pin}')" aria-label="Copiar PIN" title="Copiar PIN"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
 </div>
 <div class="res-msg">
-  <button onclick='cpMsg(${guestArg},${pinArg},${listingArg})'>📋 Copiar mensaje Airbnb + guía visual</button>
-  ${guideUrl?`<a href="${guideUrl}" target="_blank">Ver guía visual</a>`:""}
+  <button onclick='cpMsg(${guestArg},${pinArg},${listingArg},${labelArg})'>📋 Copiar mensaje Airbnb + guía digital</button>
+  ${guideUrl?`<a href="${guideUrl}" target="_blank">Ver guía digital</a>`:""}
 </div>
 </div>`;
 }
@@ -234,22 +235,22 @@ try{
 
 function cp(t){navigator.clipboard.writeText(t).then(()=>toast("Copiado"))}
 
-function isRoomWithPrivateBath(listing){
-  return (listing||"").toLowerCase().includes("aseo dentro");
+function isRoomWithPrivateBath(listing,label){
+  return label==="listing-3"||(listing||"").toLowerCase().includes("aseo dentro");
 }
 
-function isFullHouse(listing){
-  return (listing||"").toLowerCase().includes("casa completa");
+function isFullHouse(listing,label){
+  return label==="house"||(listing||"").toLowerCase().includes("casa completa");
 }
 
-function guideUrlForListing(listing){
-  if(isRoomWithPrivateBath(listing)) return ROOM_ONE_GUIDE_URL;
-  if(isFullHouse(listing)) return HOUSE_GUIDE_URL;
+function guideUrlForListing(listing,label){
+  if(isRoomWithPrivateBath(listing,label)) return ROOM_ONE_GUIDE_URL;
+  if(isFullHouse(listing,label)) return HOUSE_GUIDE_URL;
   return "";
 }
 
-function guideUrlWithPin(listing,pin){
-  const url=guideUrlForListing(listing);
+function guideUrlWithPin(listing,pin,label){
+  const url=guideUrlForListing(listing,label);
   if(!url) return "";
   return `${url}?pin=${encodeURIComponent(pin)}`;
 }
@@ -292,8 +293,8 @@ return`<div>
 </div>`;
 }
 
-function airbnbMessage(pin,listing){
-const baseGuideUrl=guideUrlWithPin(listing,pin);
+function airbnbMessage(pin,listing,label){
+const baseGuideUrl=guideUrlWithPin(listing,pin,label);
 if(!baseGuideUrl) return generalAirbnbMessage(pin,listing);
 const guideUrl=baseGuideUrl;
 return`Hola,
@@ -322,8 +323,8 @@ Cualquier duda antes o durante tu llegada, escríbenos por aquí con toda confia
 ¡Que tengas una estancia muy agradable!`;
 }
 
-function airbnbHtmlMessage(pin,listing){
-const baseGuideUrl=guideUrlWithPin(listing,pin);
+function airbnbHtmlMessage(pin,listing,label){
+const baseGuideUrl=guideUrlWithPin(listing,pin,label);
 if(!baseGuideUrl) return generalAirbnbHtmlMessage(pin,listing);
 const guideUrl=baseGuideUrl;
 return`<div>
@@ -340,9 +341,9 @@ return`<div>
 </div>`;
 }
 
-async function cpMsg(guest,pin,listing){
-const text=airbnbMessage(pin,listing);
-const html=airbnbHtmlMessage(pin,listing);
+async function cpMsg(guest,pin,listing,label){
+const text=airbnbMessage(pin,listing,label);
+const html=airbnbHtmlMessage(pin,listing,label);
 try{
   if(window.ClipboardItem){
     await navigator.clipboard.write([
